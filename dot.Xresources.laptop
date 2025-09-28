@@ -1,0 +1,209 @@
+! a) To re-read your Xresources file, and throw away your old resources, run
+!     $ xrdb ~/.Xresources
+!         or
+! b) To re-read your Xresources file, and keep your old resources, run
+!     $ xrdb -merge ~/.Xresources
+
+Xcursor.size: 36
+Xcursor.theme: Xcursor-Pro-Decay
+
+!!! --------------------------------------------------------------------------
+!   Note that the class name of xterm is XTerm, not Xterm as you might expect.
+!!! --------------------------------------------------------------------------
+
+! Lines of history to save, a.k.a. Scrollback setting              ! 
+XTerm*saveLines: 1048576
+
+/* Start as a login shell by prepending a - to argv[0] of the shell */
+/* For inclusion of environment variables */
+XTerm*loginShell: true
+
+! Allow selecting email/uri/url by double-click
+XTerm*charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
+
+XTerm*eightBitInput: false
+
+! Enable blinking cursor
+XTerm*cursorBlink: true
+  
+! Enable scrolling to the bottom of the scrolling region on key press
+XTerm*scrollKey: true
+
+! If you do not specify a font, xterm(1) loads a font named 'fixed',
+! which is an alias to a font name.
+! On FreeBSD, it resolves to:
+!   -misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-1
+! To find it:
+!   grep ^fixed /usr/local/share/fonts/misc/fonts.alias
+!   fixed       -misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-1
+
+! If you do want to specify a font, you can specify either an X Core Font
+! (bitmapped, old-style font)  -or-  an OpenType Font (OTF) or a TrueType 
+! font (TTF) (by selecting it from the FreeType library).
+!
+! So, when you want to specify a font, uncomment  XTerm*font  line, and
+! comment out  XTerm*faceName  line, or vice versa.
+! Optionally, you can also specify font size for an OTF or TTF, by using
+! XTerm*faceSize: <font_size>
+!
+! For selecting an X core font (bitmapped, or old-style font), use 
+! the font resource.
+! - See more in the man page for xterm(1); search for -fn.
+XTerm*font: -adobe-courier-medium-r-normal--24-240-75-75-m-150-iso10646-1 
+!
+! For selecting an OpenType or a TrueType font, use the faceName resource, 
+! which is used for selecting fonts from the FreeType library.
+! - See more in the man page for xterm(1); search for -fa.
+! - For the faceSize resource, search for -fs.
+!XTerm*faceName: 0xProto 
+!XTerm*faceSize: 12
+
+! https://gist.github.com/MicahElliott/718567/446d3bfec88d76b8bf65d8489e81928a2fd79ef6
+! Very surprising that now neglecting to specify font still renders
+! perfect misc-fixed font. Oh, it’s so lovely.
+! - To test it:  printf '\033[1mBOLD\033[0m\n'
+!XTerm*boldFont: -*-*-*-*-*-*-*-100-*-*-*-60-iso10646-*
+!XTerm*boldFont: -misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-1
+!XTerm*boldFont: -misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-1
+!XTerm*boldFont: -*-fixed-medium-*-*-*-*-100-*-*-*-*-iso8859-2
+XTerm*boldFont: -adobe-courier-bold-r-normal--18-180-75-75-m-110-iso8859-1
+
+XTerm*cursorColor: Cyan
+XTerm*background: Black
+XTerm*foreground: White
+
+!XTerm*borderWidth: 2
+! Tried: Red, Yellow, Slategray ! 
+XTerm*borderColor: Gray 
+xterm*colorInnerBorder: true
+
+!!! Colours2 {{{
+!!! 
+! Mikazuki colour theme
+! From browsing and generating colour schemes at
+!   https://terminal.sexy/
+! Go to Scheme Browser > /xcolors.net/mikazuki
+! Then, Export > Format: Xresources > Export
+!   Copy and paste the code
+!
+! Also, found the same colour theme here:
+!  https://github.com/janoamaral/Xresources-themes
+!  https://github.com/janoamaral/Xresources-themes/blob/master/xcolors-mikazuki.Xresources
+
+! special
+*.foreground:   #ffffff
+*.background:   #000000
+*.cursorColor:  #ffffff
+
+! black
+*.color0:       #2a1d17
+*.color8:       #4f362b
+
+! red
+*.color1:       #da1657
+*.color9:       #da4375
+
+! green
+*.color2:       #3ea250
+*.color10:      #6cb87a
+
+! yellow
+*.color3:       #e3d33d
+*.color11:      #e3da84
+
+! blue
+*.color4:       #3ea290
+*.color12:      #8ca8a3
+
+! magenta
+*.color5:       #ff850d
+*.color13:      #ffa64f
+
+! cyan
+*.color6:       #8c16da
+*.color14:      #a167c7
+
+! white
+*.color7:       #e9e9e9
+*.color15:      #fdfdfd
+!!! }}}
+
+! From: http://www.freebsdwiki.net/index.php/Unicode
+!!! Encoding {{{
+XTerm*locale: UTF-8
+!!! }}}
+
+/* Scroll to bottom when tty receives output */
+/* That is, stop output to terminal from jumping down to bottom of scroll again
+*/
+XTerm*scrollTtyOutput: false
+! Save selections to clipboard
+XTerm*selectToClipboard: true
+
+XTerm*cursorUnderLine: true
+
+/*
+   https://github.com/tmux/tmux/wiki/Clipboard
+
+   Some terminals offer an escape sequence to set the clipboard.
+   This is one of the operating system control sequences so it is known as OSC 52.
+
+   Term supports OSC 52 but it is disabled by default.
+
+   Required for tmux's
+     set -s set-clipboard external
+*/
+disallowedWindowOps: 20,21,SetXprop
+
+
+!!! Nice Fonts - FreeBSD Forums
+! https://forums.freebsd.org/threads/howto-nice-fonts.2021/page-2
+!     and
+! [Solved] Ugly fonts on some websites - FreeBSD Forums
+! https://forums.freebsd.org/threads/ugly-fonts-on-some-websites.61501/
+!    and
+! Firefox fonts jagged and ugly - FreeBSD Forums
+! https://forums.freebsd.org/threads/firefox-fonts-jagged-and-ugly.63964/
+!Xft.dpi:                                96
+!!Xft.dpi:                                110
+Xft.dpi:                                161.73
+Xft.autohint:                           1
+Xft.antialias:                          1
+Xft.hinting:                            1
+Xft.hintstyle:                          hintslight
+Xft.rgba:                               rgb
+Xft.lcdfilter:                          lcddefault
+!!! }
+
+
+! "X Window System User's Guide (Motiff Edition) - Volume Three"
+! "(c) 1991, 1993 O'Reilly and Associates, Inc."
+*VT100.Translations: #override \
+  Button1 <Btn3Down>: select-end(PRIMARY,CUT_BUFFER0,CLIPBOARD) \n\
+  !Shift <Btn2Up>:       insert-selection(CLIPBOARD) \n\
+  ~Shift ~Ctrl ~Meta <Btn2Up>:   insert-selection(PRIMARY,CUT_BUFFER0) \n\
+  <Key>F3:              string("cd ~/scratch/tmpscratch2") string(0x0d) \n\
+  Alt <Key>t: string("date | dzen2 -p 5 -bg blue") string(0x0d)
+
+
+! Change font size in xterm using keyboard
+! https://blog.rot13.org/2010/03/change-font-size-in-xterm-using-keyboard.htm
+!
+! Commented out Super (usually Windows key) because I already used it
+! in FVWM config file for other keyboard shortcuts.
+!
+! Added Alt+y for reverse video -> action: set-reverse-video().
+!
+! For other actions, refer to the man page for xterm(1).
+XTerm.VT100.translations: #override \
+Meta <Key> minus: smaller-vt-font() \n\
+Meta <Key> plus: larger-vt-font() \n\
+Meta <Key> y: set-reverse-video() \n\
+Meta <Key> KP_Subtract: smaller-vt-font() \n\
+Meta <Key> KP_Add: larger-vt-font() \n
+!Super <Key> minus: smaller-vt-font() \n\
+!Super <Key> plus: larger-vt-font() \n\
+!Super <Key> KP_Subtract: smaller-vt-font() \n\
+!Super <Key> KP_Add: larger-vt-font() \n
+
+!!! --------------------------------------------------------------------------
