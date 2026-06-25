@@ -15,14 +15,15 @@ GNOME/Wayland-specific pieces live under `gnome/`.
 
 ## Layout
 
-| Directory | Holds                                                    | Deploys to                                 |
-|-----------|----------------------------------------------------------|--------------------------------------------|
-| `shell/`  | Shell startup & aliases (`.bashrc`, `.profile`, etc.)    | symlinked into `~/`                        |
-| `gnome/`  | GNOME/Wayland setup scripts (e.g. workspace keybindings) | run on demand; not on `PATH`               |
-| `config/` | Files destined for XDG config (e.g. `environment.d/`)    | copied/symlinked into `~/.config/`         |
-| `bin/`    | Utility scripts run as everyday commands                 | symlinked into `~/.local/bin/` (on `PATH`) |
-| `x11/`    | X11/FVWM3 bits for the FreeBSD machines                  | symlinked into `~/`                        |
-| `setup/`  | Bootstrap script(s) that deploy everything above         | run manually on a new machine              |
+| Directory        | Holds                                                  | Deploys to                                 |
+|------------------|--------------------------------------------------------|--------------------------------------------|
+| `shell/`         | Shell startup & aliases (`.bashrc`, `.profile`, etc.)  | symlinked into `~/`                        |
+| `wayland/`       | Wayland compositor configs, grouped by desktop/WM      | (parent; see below)                        |
+| `wayland/gnome/` | GNOME setup scripts (e.g. workspace keybindings)       | run on demand; not on `PATH`               |
+| `config/`        | Files destined for XDG config (e.g. `environment.d/`)  | copied/symlinked into `~/.config/`         |
+| `bin/`           | Utility scripts run as everyday commands               | symlinked into `~/.local/bin/` (on `PATH`) |
+| `x11/`           | X11/FVWM3 bits for the FreeBSD machines                | symlinked into `~/`                        |
+| `setup/`         | Bootstrap script(s) that deploy everything above       | run manually on a new machine              |
 
 > Layout is descriptive of intent — add or drop directories as the repo grows.
 > The guiding rule: split by **lifecycle/deployment**, not by file type. Things
