@@ -1,49 +1,42 @@
 # ============================================================
 # calendar.txt   -   one event per line: YYYY-MM-DD  description
-# Tags (@health @car @family @subscription @trial ...) are OPTIONAL,
-# add one only when an entry feels worth flagging or filtering later.
+# Tags (@birthday @health @car @family @subscription @bill @trial ...) are
+# OPTIONAL; add one when an entry is worth flagging or filtering later.
 #
 # Tag style: calendar.txt uses @tag (todo.txt style). LIFE.TXT uses
-# :tag: (Org-mode style). The difference is intentional - each file
-# follows its own lineage, and :tag: colons delimit tags within the
-# free-form prose of LIFE.TXT, where @ alone could be ambiguous.
+# :tag: (Org-mode style). The difference is intentional - each file follows
+# its own lineage, and :tag: colons delimit tags within the free-form prose
+# of LIFE.TXT, where @ alone could be ambiguous.
 #
 # View:  agenda     (today highlighted + upcoming; see: agenda --help)
 # Edit:  vi <path>/calendar.txt   - type a dated line anywhere, save.
 #
-# Maintenance / ordering: entries may go in any order - agenda sorts by date
-# at read time. For an easy-to-read raw file, keep them interleaved in date
-# order. Annual birthdays: set the full date to the next occurrence and bump
-# the year in place as each passes, then re-sort with vi's  :%!sort  (leading
-# YYYY-MM-DD sorts chronologically as plain text). Grouped view of one type:
-#   grep @birthday <path>/calendar.txt
+# Layout: entries are kept interleaved in DATE order, so reading the raw file
+# (cat calendar.txt) shows your timeline - what is coming up, next by next.
+# agenda sorts by date at read time regardless, so order is for YOUR reading.
+#
+#   Re-sort after edits:  in vi, put the cursor on the first dated line and run
+#                         :.,$!sort      (sorts that line to end; leaves this
+#                         header alone; leading YYYY-MM-DD sorts as plain text)
+#   Grouped view by type: grep @birthday <path>/calendar.txt
+#   Annual birthdays:     set the full date to the next occurrence; bump the
+#                         year in place as each passes, then re-sort as above.
 #
 # NOTE: This is a template. The example dates below are illustrative -
 # replace them with your own. (Being in the past, they will not show as
 # upcoming in agenda until you edit them.)
 #
-# NOTE: The location is adjustable. agenda reads it from $LIFE_DIR
-# (default ~/life, so ~/life/calendar.txt). Set LIFE_DIR to point
-# elsewhere, e.g. /mnt/usbflashdrive/life/calendar.txt on a machine
-# where life/ lives on a USB drive.
+# NOTE: Location is adjustable. agenda reads it from $LIFE_DIR (default ~/life,
+# so ~/life/calendar.txt). Set LIFE_DIR to point elsewhere, e.g.
+# /mnt/usbflashdrive/life/calendar.txt on a machine using a USB drive.
 # ============================================================
 
-# ---- STABLE / PRE-POPULATED (rarely changes - birthdays, recurring bills) ----
-# Annual birthdays (repeat the date each year, or re-date after it passes):
-2026-03-12  @family  Jane Doe's birthday
-2026-09-05  @family  John Vega's birthday
-
-# Bills / known due dates:
-2026-07-15  @bill  Mortgage payment due (15th monthly)
-
-# Subscriptions started 2026-06-12 (monthly bill on the 12th; re-date as they pass):
-2026-07-12  @subscription  TSN - monthly. Still want it?
-2026-07-12  @subscription  Netflix - monthly. Still want it?
-
-# A weekly subscription - seed a few, re-seed as they pass:
-2026-06-26  @subscription  ExampleWeekly - weekly
-2026-07-03  @subscription  ExampleWeekly - weekly
-
-# ---- UPCOMING / SPONTANEOUS (add freely as life happens) ----
-2026-06-30  @trial  Example Service trial ends 2026-07-01 - cancel or keep? (started 06-24)
+2026-06-26  @subscription  ExampleWeekly - weekly (re-seed as it passes)
+2026-06-30  @trial  Example Service trial ends 2026-07-01 - cancel or keep?
 2026-07-02  @health  Dr. - annual checkup 9:30am
+2026-07-03  @subscription  ExampleWeekly - weekly
+2026-07-12  @subscription  Netflix - monthly. Still want it?
+2026-07-12  @subscription  TSN - monthly. Still want it?
+2026-07-15  @bill  Mortgage payment due (15th monthly)
+2026-09-05  @birthday @family  John Vega (b. 1980)
+2027-03-12  @birthday @family  Jane Doe (b. 1973)
