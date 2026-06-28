@@ -24,6 +24,7 @@ CAL_FILE="${CAL_FILE:-$LIFE_DIR/calendar.txt}"
 #   built-in default  <  exported env var  <  command-line option
 AGENDA_LEAD="${AGENDA_LEAD:-2}"   # days of lead warning for due: follow-ups
 CAL_DAYS="${CAL_DAYS:-7}"         # calendar horizon in days
+ONLY="${ONLY:-all}"              # which section(s) to show; "all" = everything
 # -------------------------------------------------------------------------
 
 usage() {
@@ -34,6 +35,11 @@ Usage: agenda [options]
   calendar events, open :todo:/:waiting: items, and due: follow-ups.
 
 Options:
+  -o, --only SECTION    Show only one section. SECTION is one of:
+                          cal | calendar   - the calendar only
+                          life             - LIFE.TXT items (todo+waiting+due)
+                          todo | waiting | due  - a single section
+                        Default: show all sections.
   -l, --agenda-lead N   Lead time (days) to surface due: follow-ups early.
                         Default ${AGENDA_LEAD}.
   -c, --cal-days N      Calendar horizon: show events through N days ahead.
@@ -44,7 +50,9 @@ Paths come from \$LIFE_DIR (default ~/life). Options override env vars,
 which override the built-in defaults.
 
 Examples:
-  agenda                       # daily glance, defaults
+  agenda                       # daily glance, all sections
+  agenda --only cal            # calendar items only
+  agenda --only life           # LIFE.TXT items only (todo+waiting+due)
   agenda --cal-days 30         # one-off monthly sweep
   agenda -c 30 -l 5            # 30-day horizon, 5-day due lead
 USAGE
@@ -60,6 +68,8 @@ while [ $# -gt 0 ]; do
         --agenda-lead=*)  AGENDA_LEAD="${1#*=}"; shift ;;
         -c|--cal-days)    CAL_DAYS="$2"; shift 2 ;;
         --cal-days=*)     CAL_DAYS="${1#*=}"; shift ;;
+        -o|--only)        ONLY="$2"; shift 2 ;;
+        --only=*)         ONLY="${1#*=}"; shift ;;
         -h|--help)        usage; exit 0 ;;
         --)               shift; break ;;
         -*)               echo "agenda: unknown option: $1" >&2; usage >&2; exit 2 ;;
@@ -77,6 +87,22 @@ if ! is_posint "$CAL_DAYS"; then
     exit 2
 fi
 
+# Normalize and validate --only, then set per-section visibility flags.
+# Groupings: "cal"/"calendar" = calendar; "life" = todo+waiting+due.
+show_cal=no; show_todo=no; show_waiting=no; show_due=no
+case "$ONLY" in
+    all)                show_cal=yes; show_todo=yes; show_waiting=yes; show_due=yes ;;
+    cal|calendar)       show_cal=yes ;;
+    life)               show_todo=yes; show_waiting=yes; show_due=yes ;;
+    todo)               show_todo=yes ;;
+    waiting)            show_waiting=yes ;;
+    due)                show_due=yes ;;
+    *)
+        echo "agenda: --only must be one of: all, cal, calendar, life, todo, waiting, due (got: $ONLY)" >&2
+        exit 2
+        ;;
+esac
+
 today=$(date +%F)
 
 # Horizon date = today + AGENDA_LEAD days. A due:DATE <= horizon is "due soon".
@@ -93,7 +119,20 @@ else
     HL=''; BOLD=''; RST=''
 fi
 
+# ---- helper: pull open (not :done:) lines for a given tag from LIFE.TXT --
+open_lines() {  # $1 = tag without colons, e.g. todo
+    tag=$1
+    [ -f "$LIFE_FILE" ] || return 0
+    grep -i ":$tag:" "$LIFE_FILE" 2>/dev/null | grep -vi ":done:"
+}
+
+# ---- helper: blank-line separator, but only after the first shown section --
+_printed=no
+sep() { [ "$_printed" = yes ] && echo; _printed=yes; }
+
 # ---- 1. Calendar: today highlighted, next CAL_DAYS days listed ----------
+if [ "$show_cal" = yes ]; then
+sep
 echo "${BOLD}=== CALENDAR - today ($today) + next ${CAL_DAYS} days ===${RST}"
 if [ -f "$CAL_FILE" ]; then
     # Compute the cutoff date (today + CAL_DAYS days) for the upcoming window.
@@ -116,16 +155,11 @@ if [ -f "$CAL_FILE" ]; then
 else
     echo "    (no calendar file at $CAL_FILE)"
 fi
-
-# ---- helper: pull open (not :done:) lines for a given tag from LIFE.TXT --
-open_lines() {  # $1 = tag without colons, e.g. todo
-    tag=$1
-    [ -f "$LIFE_FILE" ] || return 0
-    grep -i ":$tag:" "$LIFE_FILE" 2>/dev/null | grep -vi ":done:"
-}
+fi   # show_cal
 
 # ---- 2. Open todos ------------------------------------------------------
-echo
+if [ "$show_todo" = yes ]; then
+sep
 echo "${BOLD}=== TODO - open :todo: ===${RST}"
 todos=$(open_lines todo)
 if [ -n "$todos" ]; then
@@ -133,9 +167,11 @@ if [ -n "$todos" ]; then
 else
     echo "    (none open)"
 fi
+fi   # show_todo
 
 # ---- 3. Open waiting-fors ----------------------------------------------
-echo
+if [ "$show_waiting" = yes ]; then
+sep
 echo "${BOLD}=== WAITING - open :waiting: ===${RST}"
 waiting=$(open_lines waiting)
 if [ -n "$waiting" ]; then
@@ -143,10 +179,11 @@ if [ -n "$waiting" ]; then
 else
     echo "    (none open)"
 fi
+fi   # show_waiting
 
 # ---- 4. Due-soon / overdue follow-ups (due:YYYY-MM-DD tokens in LIFE.TXT) ----
 # Any open line carrying due:DATE where DATE <= horizon (today + lead) is LOUD.
-if [ -f "$LIFE_FILE" ]; then
+if [ "$show_due" = yes ] && [ -f "$LIFE_FILE" ]; then
     due=$(grep -iE 'due:[0-9]{4}-[0-9]{2}-[0-9]{2}' "$LIFE_FILE" 2>/dev/null \
           | grep -vi ':done:' \
           | awk -v horizon="$due_horizon" -v today="$today" '
@@ -177,7 +214,7 @@ if [ -f "$LIFE_FILE" ]; then
                 }
             }')
     if [ -n "$due" ]; then
-        echo
+        sep
         echo "${BOLD}${HL}=== DUE soon / overdue (due: <= $due_horizon, lead ${AGENDA_LEAD}d) ===${RST}"
         # Prefix "! " and the loud bracketed marker; marker is plain-text loud,
         # highlight is the extra (colour) cue on top where the terminal supports it.
