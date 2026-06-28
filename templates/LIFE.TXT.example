@@ -1,0 +1,40 @@
+# ============================================================
+# LIFE.TXT  -  one big text file (OBTF): journal, ideas, notes, and todos,
+# in one chronological stream. Structure comes from :tags:, not separate files.
+#
+# Entry format:   YYYY-MM-DD Day | free text here :tag:tag:
+# Separator:      a *** line between entries (visual only; agenda ignores it).
+#
+# Tag style: LIFE.TXT uses :tag: (Org-mode style). calendar.txt uses
+# @tag (todo.txt style). The difference is intentional - each file follows
+# its own lineage, and here the :tag: colons delimit tags within free-form
+# prose, where @ alone could be ambiguous against ordinary words.
+#
+# How agenda reads this file:
+#   open todo      = a line with :todo:    and NOT :done:
+#   open waiting   = a line with :waiting: and NOT :done:
+#   closed item    = add :done: in place; it then drops out of agenda
+#   due follow-up  = add  due:YYYY-MM-DD  to a line; agenda surfaces it LOUD
+#                    within its lead window (see: agenda --help)
+#
+# NOTE: This is a template. Example dates are illustrative - replace with
+# your own. Location is adjustable: agenda reads it from $LIFE_DIR
+# (default ~/life, so ~/life/LIFE.TXT); set LIFE_DIR to point elsewhere,
+# e.g. /mnt/usbflashdrive/life/LIFE.TXT on a machine using a USB drive.
+# ============================================================
+
+***                                   ***                                    ***
+2026-05-12 Tue | Idea: write a short post on the RHEL 10 migration :blog:idea:
+***                                   ***                                    ***
+2026-05-14 Thu | Grateful the monitor toggle script works on the FreeBSD box.
+***                                   ***                                    ***
+2026-06-01 Mon | Renew the domain before it lapses due:2026-06-20 :todo:
+***                                   ***                                    ***
+2026-06-03 Wed | Old finished task, kept for the record :todo:done:
+***                                   ***                                    ***
+2026-06-10 Wed | Reference: rtw89_8852be is the Wi-Fi driver on the E14 :reference:hardware:
+***                                   ***                                    ***
+2026-06-26 Fri | Example service double-charged; support ticket sent, awaiting reply; follow up, else dispute due:2026-06-29 :waiting:
+***                                   ***                                    ***
+2026-06-28 Sun | Resolved: refund received, ticket closed :waiting:done:
+***                                   ***                                    ***

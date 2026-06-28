@@ -16,8 +16,8 @@
 # upcoming in agenda until you edit them.)
 #
 # NOTE: The location is adjustable. agenda reads it from $LIFE_DIR
-# (default ~/life, so ~/life/stacks/calendar.txt). Set LIFE_DIR to point
-# elsewhere, e.g. /mnt/usbflashdrive/life/stacks/calendar.txt on a machine
+# (default ~/life, so ~/life/calendar.txt). Set LIFE_DIR to point
+# elsewhere, e.g. /mnt/usbflashdrive/life/calendar.txt on a machine
 # where life/ lives on a USB drive.
 # ============================================================
 
