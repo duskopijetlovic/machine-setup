@@ -11,6 +11,13 @@
 # View:  agenda     (today highlighted + upcoming; see: agenda --help)
 # Edit:  vi <path>/calendar.txt   - type a dated line anywhere, save.
 #
+# Maintenance / ordering: entries may go in any order - agenda sorts by date
+# at read time. For an easy-to-read raw file, keep them interleaved in date
+# order. Annual birthdays: set the full date to the next occurrence and bump
+# the year in place as each passes, then re-sort with vi's  :%!sort  (leading
+# YYYY-MM-DD sorts chronologically as plain text). Grouped view of one type:
+#   grep @birthday <path>/calendar.txt
+#
 # NOTE: This is a template. The example dates below are illustrative -
 # replace them with your own. (Being in the past, they will not show as
 # upcoming in agenda until you edit them.)
