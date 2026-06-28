@@ -1,0 +1,186 @@
+#!/bin/sh
+# agenda — one unified daily view over your plain-text life.
+#
+# Surfaces, in one screen:
+#   1. Today's events + next CAL_DAYS days from calendar.txt (today highlighted)
+#   2. Open todos from LIFE.TXT      (:todo: lines lacking :done:)
+#   3. Open waiting-fors from LIFE.TXT (:waiting: lines lacking :done:)
+#   4. Any LIFE.TXT line with a due:YYYY-MM-DD token that is due within the
+#      lead-time window (today + AGENDA_LEAD days) or overdue, flagged LOUD,
+#      so date-triggered follow-ups surface with time to act.
+#
+# You only ever RUN this; you never have to check the files individually.
+# Edit the files directly with vi when you have something to add.
+#
+# ---- Configurable paths -------------------------------------------------
+# Override per-machine by exporting LIFE_DIR in your shell, e.g.
+#   export LIFE_DIR=/mnt/usbflashdrive/life      (FreeBSD / USB)
+# Defaults to ~/life otherwise.
+LIFE_DIR="${LIFE_DIR:-$HOME/life}"
+LIFE_FILE="${LIFE_FILE:-$LIFE_DIR/LIFE.TXT}"
+CAL_FILE="${CAL_FILE:-$LIFE_DIR/calendar.txt}"
+
+# Defaults (lowest precedence). Order of precedence, lowest to highest:
+#   built-in default  <  exported env var  <  command-line option
+AGENDA_LEAD="${AGENDA_LEAD:-2}"   # days of lead warning for due: follow-ups
+CAL_DAYS="${CAL_DAYS:-7}"         # calendar horizon in days
+# -------------------------------------------------------------------------
+
+usage() {
+    cat <<USAGE
+Usage: agenda [options]
+
+  One unified daily view over your plain-text life:
+  calendar events, open :todo:/:waiting: items, and due: follow-ups.
+
+Options:
+  -l, --agenda-lead N   Lead time (days) to surface due: follow-ups early.
+                        Default ${AGENDA_LEAD}.
+  -c, --cal-days N      Calendar horizon: show events through N days ahead.
+                        Default ${CAL_DAYS}.  (e.g. --cal-days 30 for a sweep)
+  -h, --help            Show this help and exit.
+
+Paths come from \$LIFE_DIR (default ~/life). Options override env vars,
+which override the built-in defaults.
+
+Examples:
+  agenda                       # daily glance, defaults
+  agenda --cal-days 30         # one-off monthly sweep
+  agenda -c 30 -l 5            # 30-day horizon, 5-day due lead
+USAGE
+}
+
+# ---- Parse command-line options (override env/defaults) -----------------
+# POSIX-portable parsing of both --long val, --long=val, and short -x val.
+is_posint() { case "$1" in ''|*[!0-9]*) return 1 ;; *) return 0 ;; esac; }
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -l|--agenda-lead) AGENDA_LEAD="$2"; shift 2 ;;
+        --agenda-lead=*)  AGENDA_LEAD="${1#*=}"; shift ;;
+        -c|--cal-days)    CAL_DAYS="$2"; shift 2 ;;
+        --cal-days=*)     CAL_DAYS="${1#*=}"; shift ;;
+        -h|--help)        usage; exit 0 ;;
+        --)               shift; break ;;
+        -*)               echo "agenda: unknown option: $1" >&2; usage >&2; exit 2 ;;
+        *)                echo "agenda: unexpected argument: $1" >&2; usage >&2; exit 2 ;;
+    esac
+done
+
+# Validate: both must be non-negative integers.
+if ! is_posint "$AGENDA_LEAD"; then
+    echo "agenda: --agenda-lead must be a non-negative integer (got: $AGENDA_LEAD)" >&2
+    exit 2
+fi
+if ! is_posint "$CAL_DAYS"; then
+    echo "agenda: --cal-days must be a non-negative integer (got: $CAL_DAYS)" >&2
+    exit 2
+fi
+
+today=$(date +%F)
+
+# Horizon date = today + AGENDA_LEAD days. A due:DATE <= horizon is "due soon".
+# GNU date (RHEL) first, BSD/FreeBSD date second; if both fail, horizon=today
+# (lead time disabled, items surface only on/after their due date).
+due_horizon=$(date -d "+$AGENDA_LEAD day" +%F 2>/dev/null) \
+    || due_horizon=$(date -v+"${AGENDA_LEAD}"d +%F 2>/dev/null) \
+    || due_horizon="$today"
+
+# ANSI: reverse-video for highlight, bold for headers. Disabled if not a tty.
+if [ -t 1 ]; then
+    HL=$(printf '\033[7m'); BOLD=$(printf '\033[1m'); RST=$(printf '\033[0m')
+else
+    HL=''; BOLD=''; RST=''
+fi
+
+# ---- 1. Calendar: today highlighted, next CAL_DAYS days listed ----------
+echo "${BOLD}=== CALENDAR - today ($today) + next ${CAL_DAYS} days ===${RST}"
+if [ -f "$CAL_FILE" ]; then
+    # Compute the cutoff date (today + CAL_DAYS days) for the upcoming window.
+    # GNU date (RHEL/Linux) first; BSD/FreeBSD form second.
+    cutoff=$(date -d "+$CAL_DAYS day" +%F 2>/dev/null) \
+        || cutoff=$(date -v+"${CAL_DAYS}"d +%F 2>/dev/null) \
+        || cutoff="9999-12-31"                    # if both fail, show all upcoming
+
+    # Strip comments/blanks, keep dated lines, sort by date (portable: plain sort),
+    # then mark today's lines. No gawk-only functions used.
+    grep -v '^[[:space:]]*#' "$CAL_FILE" 2>/dev/null \
+      | grep -v '^[[:space:]]*$' \
+      | sort \
+      | awk -v today="$today" -v cutoff="$cutoff" -v days="$CAL_DAYS" -v hl="$HL" -v rst="$RST" '
+            { d = substr($0, 1, 10) }
+            d == today                  { print "  " hl $0 rst; shown=1; next }
+            d > today && d <= cutoff    { print "    " $0;       shown=1 }
+            END { if (!shown) print "    (nothing today or in the next " days " days)" }
+        '
+else
+    echo "    (no calendar file at $CAL_FILE)"
+fi
+
+# ---- helper: pull open (not :done:) lines for a given tag from LIFE.TXT --
+open_lines() {  # $1 = tag without colons, e.g. todo
+    tag=$1
+    [ -f "$LIFE_FILE" ] || return 0
+    grep -i ":$tag:" "$LIFE_FILE" 2>/dev/null | grep -vi ":done:"
+}
+
+# ---- 2. Open todos ------------------------------------------------------
+echo
+echo "${BOLD}=== TODO - open :todo: ===${RST}"
+todos=$(open_lines todo)
+if [ -n "$todos" ]; then
+    printf '%s\n' "$todos" | sed 's/^/    /'
+else
+    echo "    (none open)"
+fi
+
+# ---- 3. Open waiting-fors ----------------------------------------------
+echo
+echo "${BOLD}=== WAITING - open :waiting: ===${RST}"
+waiting=$(open_lines waiting)
+if [ -n "$waiting" ]; then
+    printf '%s\n' "$waiting" | sed 's/^/    /'
+else
+    echo "    (none open)"
+fi
+
+# ---- 4. Due-soon / overdue follow-ups (due:YYYY-MM-DD tokens in LIFE.TXT) ----
+# Any open line carrying due:DATE where DATE <= horizon (today + lead) is LOUD.
+if [ -f "$LIFE_FILE" ]; then
+    due=$(grep -iE 'due:[0-9]{4}-[0-9]{2}-[0-9]{2}' "$LIFE_FILE" 2>/dev/null \
+          | grep -vi ':done:' \
+          | awk -v horizon="$due_horizon" -v today="$today" '
+            # Convert YYYY-MM-DD to an absolute day number (proleptic Gregorian).
+            # Pure arithmetic — no mktime — so it works on gawk AND BSD/mawk awk.
+            function g2d(s,   y,m,d,a,yy,mm) {
+                y = substr(s,1,4)+0; m = substr(s,6,2)+0; d = substr(s,9,2)+0
+                a  = int((14 - m) / 12)
+                yy = y + 4800 - a
+                mm = m + 12*a - 3
+                return d + int((153*mm + 2)/5) + 365*yy \
+                       + int(yy/4) - int(yy/100) + int(yy/400) - 32045
+            }
+            {
+                if (match($0, /due:[0-9]{4}-[0-9]{2}-[0-9]{2}/)) {
+                    dstr = substr($0, RSTART+4, 10)
+                    if (dstr <= horizon) {
+                        delta = g2d(dstr) - g2d(today)   # days from today (neg = overdue)
+                        if      (delta < 0)  tag = sprintf("[OVERDUE %dd]", -delta)
+                        else if (delta == 0) tag = "[DUE TODAY]"
+                        else                 tag = sprintf("[DUE IN %dd]", delta)
+                        # Make the literal due:DATE token stand out in plain text
+                        # (strict ASCII), complementing the [DUE ...] marker.
+                        line = $0
+                        sub(/due:[0-9]{4}-[0-9]{2}-[0-9]{2}/, ">>>&<<<", line)
+                        printf "%-14s %s\n", tag, line    # left-pad marker to align text
+                    }
+                }
+            }')
+    if [ -n "$due" ]; then
+        echo
+        echo "${BOLD}${HL}=== DUE soon / overdue (due: <= $due_horizon, lead ${AGENDA_LEAD}d) ===${RST}"
+        # Prefix "! " and the loud bracketed marker; marker is plain-text loud,
+        # highlight is the extra (colour) cue on top where the terminal supports it.
+        printf '%s\n' "$due" | sed "s/^/  ${HL}! ${RST}/"
+    fi
+fi
