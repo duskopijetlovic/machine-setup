@@ -13,8 +13,10 @@
 # Edit the files directly with vi when you have something to add.
 #
 # ---- Configurable paths -------------------------------------------------
-# Override per-machine by exporting LIFE_DIR in your shell, e.g.
-#   export LIFE_DIR=/mnt/usbflashdrive/life      (FreeBSD / USB)
+# Override per-machine by setting LIFE_DIR in your shell before running:
+#   bash/sh/zsh:   export LIFE_DIR=/mnt/usbflashdrive/life
+#   csh/tcsh:      setenv LIFE_DIR /mnt/usbflashdrive/life
+# (The same applies to AGENDA_LEAD, CAL_DAYS, ONLY below.)
 # Defaults to ~/life otherwise.
 LIFE_DIR="${LIFE_DIR:-$HOME/life}"
 LIFE_FILE="${LIFE_FILE:-$LIFE_DIR/LIFE.TXT}"
@@ -186,7 +188,7 @@ fi   # show_waiting
 if [ "$show_due" = yes ] && [ -f "$LIFE_FILE" ]; then
     due=$(grep -iE 'due:[0-9]{4}-[0-9]{2}-[0-9]{2}' "$LIFE_FILE" 2>/dev/null \
           | grep -vi ':done:' \
-          | awk -v horizon="$due_horizon" -v today="$today" '
+          | awk -v horizon="$due_horizon" -v today="$today" -v hl="$HL" -v rst="$RST" '
             # Convert YYYY-MM-DD to an absolute day number (proleptic Gregorian).
             # Pure arithmetic — no mktime — so it works on gawk AND BSD/mawk awk.
             function g2d(s,   y,m,d,a,yy,mm) {
@@ -207,9 +209,11 @@ if [ "$show_due" = yes ] && [ -f "$LIFE_FILE" ]; then
                         else                 tag = sprintf("[DUE IN %dd]", delta)
                         # Make the literal due:DATE token stand out in plain text
                         # (strict ASCII), complementing the [DUE ...] marker.
-                        # Uppercase DUE + arrows so it shouts like the marker.
+                        # Uppercase DUE + arrows so it shouts like the marker, with
+                        # a reverse-video "!" just before it (HL/RST passed in as
+                        # hl/rst; empty when not a tty, so plain ASCII in pipes).
                         line = $0
-                        sub(/due:([0-9]{4}-[0-9]{2}-[0-9]{2})/, ">>> DUE:" dstr " <<<", line)
+                        sub(/due:([0-9]{4}-[0-9]{2}-[0-9]{2})/, hl "!" rst " >>> DUE:" dstr " <<<", line)
                         printf "%-14s %s\n", tag, line    # left-pad marker to align text
                     }
                 }
