@@ -78,7 +78,6 @@ Notes on FreeBSD name differences vs RHEL:
 
 ## Cross-platform name map (quick reference)
 
-+----------------------+------------------------+------------------+--------------------------------+
 | Purpose              | RHEL 10 (dnf)          | FreeBSD 14 (pkg) | Notes                          |
 |----------------------|------------------------|------------------|--------------------------------|
 | Office suite         | libreoffice            | libreoffice      | same name                      |
@@ -88,4 +87,3 @@ Notes on FreeBSD name differences vs RHEL:
 | Calendar reminders   | remind (from source)   | remind (pkg)     | not in EPEL 10; source on RHEL |
 | Screenshot           | gnome-screenshot-tool  | (n/a — X11)      | Wayland-native on RHEL         |
 | (add rows as you go) |                        |                  |                                |
-+----------------------+------------------------+------------------+--------------------------------+
