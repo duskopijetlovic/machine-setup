@@ -1,7 +1,7 @@
 # Packages for a new machine
 
 Software to install when provisioning a machine. Organized by platform and by
-install method, because the same software often has different package names —
+install method, because the same software often has different package names -
 or no package at all - across RHEL and FreeBSD.
 
 This is a **read-and-run reference**, not an automated script: review it, then
@@ -62,7 +62,7 @@ These have no dnf package on RHEL 10 and are built from upstream. Build deps
 ## FreeBSD 14 (pkg)
 
 ```
-sudo pkg install \
+$ sudo pkg install \
   libreoffice \
   vim \
   remind \
