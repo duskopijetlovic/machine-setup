@@ -209,11 +209,11 @@ if [ "$show_due" = yes ] && [ -f "$LIFE_FILE" ]; then
                         else                 tag = sprintf("[DUE IN %dd]", delta)
                         # Make the literal due:DATE token stand out in plain text
                         # (strict ASCII), complementing the [DUE ...] marker.
-                        # Uppercase DUE + arrows so it shouts like the marker, with
-                        # a reverse-video "!" just before it (HL/RST passed in as
-                        # hl/rst; empty when not a tty, so plain ASCII in pipes).
+                        # Uppercase DUE in brackets so it shouts like the marker,
+                        # with a reverse-video "!" just before it (hl/rst empty
+                        # when not a tty, so plain ASCII in pipes).
                         line = $0
-                        sub(/due:([0-9]{4}-[0-9]{2}-[0-9]{2})/, hl "!" rst " >>> DUE:" dstr " <<<", line)
+                        sub(/due:([0-9]{4}-[0-9]{2}-[0-9]{2})/, hl "!" rst " [    DUE:" dstr " ]", line)
                         printf "%-14s %s\n", tag, line    # left-pad marker to align text
                     }
                 }
