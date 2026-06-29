@@ -2,7 +2,7 @@
 
 Personal machine setup: dotfiles, configuration, utility scripts, and the
 bootstrap to deploy them. This is the single source of truth for making a
-fresh machine "mine" — clone it, run the bootstrap, and the configuration
+fresh machine "mine" - clone it, run the bootstrap, and the configuration
 below is put into place.
 
 Targets: RHEL 10.x (GNOME/Wayland) on the primary machines, with FreeBSD 14
@@ -15,7 +15,7 @@ GNOME/Wayland-specific pieces live under `wayland/gnome/`.
 
 ## Config, not data
 
-This repository holds **machinery** — configuration, scripts, and the bootstrap
+This repository holds **machinery** - configuration, scripts, and the bootstrap
 that deploys them. It does **not** hold **personal data**.
 
 Plain-text personal data (calendar, todos, journal, waiting-fors — e.g.
@@ -23,9 +23,9 @@ Plain-text personal data (calendar, todos, journal, waiting-fors — e.g.
 the sync + backup layer (Syncthing across machines, Borg/restic for backups).
 Reasons this separation is strict:
 
-- **Privacy** — personal data must never be pushed to a public host.
-- **Churn** — daily-edited data would flood the repo with noise commits.
-- **Clean provenance** — "how my machine is set up" and "what is in my life"
+- **Privacy** - personal data must never be pushed to a public host.
+- **Churn** - daily-edited data would flood the repo with noise commits.
+- **Clean provenance** - "how my machine is set up" and "what is in my life"
   are different concerns and belong in different places.
 
 This repo *does* carry **example/skeleton** versions of those data files (see
@@ -55,10 +55,10 @@ never under version control here.
 
 Two categories of script live here, with different homes and habits:
 
-- **Setup scripts** (run rarely, to *establish* state) — e.g.
+- **Setup scripts** (run rarely, to *establish* state) - e.g.
   `wayland/gnome/gnome-workspace-jumps.sh`. Invoked deliberately when
   configuring a machine or changing a preference. Not placed on `PATH`.
-- **Utility scripts** (run often, as commands) — e.g. `bin/agenda`,
+- **Utility scripts** (run often, as commands) - e.g. `bin/agenda`,
   `bin/backup-repos.sh`. Kept canonical here and symlinked into
   `~/.local/bin/` so they're callable by name.
 
@@ -74,10 +74,10 @@ $ ./setup/install.sh               # create symlinks / copy config into place
 
 Three deploy verbs, by kind of file:
 
-- **Symlink** — things edited in-repo (shell rc files, utility scripts) are
+- **Symlink** - things edited in-repo (shell rc files, utility scripts) are
   symlinked so the repo stays the master copy.
-- **Copy** — config that must be a real file at its destination is copied.
-- **Seed (copy-once, never overwrite)** — `templates/*.example` files are
+- **Copy** - config that must be a real file at its destination is copied.
+- **Seed (copy-once, never overwrite)** - `templates/*.example` files are
   copied to their live location **only if no live file already exists there**.
   This bootstraps a starting `~/life/` on a fresh machine without ever
   clobbering real data on an existing one. Seeds are copied, never symlinked —
