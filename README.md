@@ -18,7 +18,7 @@ GNOME/Wayland-specific pieces live under `wayland/gnome/`.
 This repository holds **machinery** - configuration, scripts, and the bootstrap
 that deploys them. It does **not** hold **personal data**.
 
-Plain-text personal data (calendar, todos, journal, waiting-fors — e.g.
+Plain-text personal data (calendar, todos, journal, waiting-fors - e.g.
 `~/life/LIFE.TXT`, `~/life/stacks/calendar.txt`) lives **outside this repo**, in
 the sync + backup layer (Syncthing across machines, Borg/restic for backups).
 Reasons this separation is strict:
@@ -29,7 +29,7 @@ Reasons this separation is strict:
   are different concerns and belong in different places.
 
 This repo *does* carry **example/skeleton** versions of those data files (see
-`templates/`) so a new machine can be seeded with a starting structure — but the
+`templates/`) so a new machine can be seeded with a starting structure - but the
 real, live data files always live in `~/life/` (or wherever `$LIFE_DIR` points),
 never under version control here.
 
@@ -46,7 +46,7 @@ never under version control here.
 | `templates/`     | Skeleton/example personal-data files (`*.example`)       | **copied** as seeds, only if absent (see below) |
 | `setup/`         | Bootstrap script(s) that deploy everything above         | run manually on a new machine                   |
 
-> Layout is descriptive of intent — add or drop directories as the repo grows.
+> Layout is descriptive of intent - add or drop directories as the repo grows.
 > The guiding rule: split by **lifecycle/deployment**, not by file type. Things
 > set up together in one pass on a new machine live here together, organized by
 > directory rather than by separate repositories.
@@ -80,7 +80,7 @@ Three deploy verbs, by kind of file:
 - **Seed (copy-once, never overwrite)** - `templates/*.example` files are
   copied to their live location **only if no live file already exists there**.
   This bootstraps a starting `~/life/` on a fresh machine without ever
-  clobbering real data on an existing one. Seeds are copied, never symlinked —
+  clobbering real data on an existing one. Seeds are copied, never symlinked -
   once seeded, the live file is private data that diverges from the template
   and must not be tracked back into this repo.
 
