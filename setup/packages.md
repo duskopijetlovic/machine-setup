@@ -2,7 +2,7 @@
 
 Software to install when provisioning a machine. Organized by platform and by
 install method, because the same software often has different package names —
-or no package at all — across RHEL and FreeBSD.
+or no package at all - across RHEL and FreeBSD.
 
 This is a **read-and-run reference**, not an automated script: review it, then
 run the relevant sections by hand. (Promote to a script only if the manual
@@ -16,15 +16,15 @@ installs ever become tedious enough to justify the automation.)
 Many packages below live in EPEL, which also needs CRB (CodeReady Builder):
 
 ```
-sudo subscription-manager repos --enable codeready-builder-for-rhel-10-x86_64-rpms
-sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+$ sudo subscription-manager repos --enable codeready-builder-for-rhel-10-x86_64-rpms
+$ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 ```
 (On a non-subscribed/Stream box, enable CRB with:
 `sudo dnf config-manager --set-enabled crb`)
 
 ### From the base/AppStream/CRB repos
 ```
-sudo dnf install \
+$ sudo dnf install \
   libreoffice \
   vim-enhanced \
   tcsh \
@@ -38,7 +38,7 @@ sudo dnf install \
 
 ### From EPEL (requires EPEL+CRB enabled, above)
 ```
-sudo dnf install \
+$ sudo dnf install \
   remind        # NOTE: verify — may NOT be in EPEL 10; see "from source" below
   # ... other EPEL-only packages
 ```
@@ -47,14 +47,14 @@ sudo dnf install \
 These have no dnf package on RHEL 10 and are built from upstream. Build deps
 (gcc, make, etc.) are in the base section above.
 
-- **remind** — https://dianne.skoll.ca/projects/remind/
+- **remind** - https://dianne.skoll.ca/projects/remind/
   ```
   cd /tmp
   curl -LO https://dianne.skoll.ca/projects/remind/download/remind-<version>.tar.gz
   tar xzf remind-<version>.tar.gz && cd remind-<version>
   ./configure && make && make test && sudo make install   # installs to /usr/local
   ```
-- **Claws Mail** — built from source on RHEL 10 (not in EPEL 10).
+- **Claws Mail** - built from source on RHEL 10 (not in EPEL 10).
   # (add build steps / upstream pointer)
 
 ---
