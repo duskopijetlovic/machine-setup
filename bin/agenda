@@ -57,6 +57,8 @@ Examples:
   agenda --only life           # LIFE.TXT items only (todo+waiting+due)
   agenda --cal-days 30         # one-off monthly sweep
   agenda -c 30 -l 5            # 30-day horizon, 5-day due lead
+
+Full reference: doc/agenda.txt
 USAGE
 }
 
