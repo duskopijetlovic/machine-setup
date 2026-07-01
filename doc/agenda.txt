@@ -35,6 +35,12 @@ ENVIRONMENT
     CAL_FILE     calendar.txt path            default $LIFE_DIR/calendar.txt
     CAL_DAYS     same as -c                   default 7
     AGENDA_LEAD  same as -l                   default 2
+    ONLY         same as -o                   default unset (all sections)
+
+    Override per-machine, before running agenda -- same syntax applies
+    to LIFE_DIR, AGENDA_LEAD, CAL_DAYS, and ONLY:
+        bash/sh/zsh:   export LIFE_DIR=/mnt/usbflashdrive/life
+        csh/tcsh:      setenv LIFE_DIR /mnt/usbflashdrive/life
 
 DUE MARKERS
     [DUE IN Nd]    due:DATE is inside the lead window, not due yet
@@ -71,7 +77,7 @@ GREP RECIPES
         grep 'due:2026-08-1[0-5]' ~/life/LIFE.TXT        # a date range
 
 FILES
-    ~/life/LIFE.TXT               journal / notes / :tag: items -- see its
+    ~/life/LIFE.TXT               journal / notes / :tag: items -- see its 
                                       own legend block for tag conventions
     ~/life/calendar.txt           dated events only, chronological, @tag
 
