@@ -52,9 +52,32 @@ EXAMPLES
     agenda -c 30            monthly sweep of the calendar
     agenda -c 30 -l 5       wider horizon + earlier due-soon warning
 
+GREP RECIPES
+    For lookups agenda's own flags don't cover -- past the horizon, or
+    narrowed by keyword instead of by section. 
+
+    Tag-axis greps (state/area/project):
+        grep ':todo:'      # finds all open actions; swap state as needed
+        grep ':health:'    #finds all entries in that area
+        grep -o ':project_[a-z0-9_]*:' | sort -u    # lists all
+
+    Narrow agenda's live view by keyword:
+        agenda | grep -i "dentist"
+        agenda --only waiting | grep -i "refund"
+        agenda --only life | grep ':project_taxes2026:'
+
+    Calendar past CAL_DAYS -- agenda only shows a window, not the file:
+        grep '^2026-08' ~/life/stacks/calendar.txt      # a given month
+        grep -i "dentist" ~/life/stacks/calendar.txt    # any date, by keyword
+
+    due: dates past AGENDA_LEAD -- same idea, direct in LIFE.TXT:
+        grep 'due:'    # finds all dated actions; grep 'due:2026-' for a year
+        grep 'due:2026-08' ~/life/LIFE.TXT               # a given month
+        grep 'due:2026-08-1[0-5]' ~/life/LIFE.TXT        # a date range
+
 FILES
-    ~/life/LIFE.TXT               journal / notes / :tag: items -- see
-                                   its own legend block for tag conventions
+    ~/life/LIFE.TXT               journal / notes / :tag: items -- see its
+                                      own legend block for tag conventions
     ~/life/stacks/calendar.txt    dated events only, chronological, @tag
 
 DEPLOYMENT
