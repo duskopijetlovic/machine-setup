@@ -58,7 +58,7 @@ Examples:
   agenda --cal-days 30         # one-off monthly sweep
   agenda -c 30 -l 5            # 30-day horizon, 5-day due lead
 
-Full reference: doc/agenda.txt
+Full reference: agenda.txt (in 'machine-setup' repo -> doc/agenda.txt)
 USAGE
 }
 
