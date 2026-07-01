@@ -1,0 +1,63 @@
+agenda(1) CHEATSHEET
+---------------------
+NAME
+    agenda -- unified daily view: calendar.txt events + LIFE.TXT open items
+
+SYNOPSIS
+    agenda [-o|--only SECTION] [-c|--cal-days N] [-l|--agenda-lead N] [-h|--help]
+
+SECTIONS PRINTED
+    CALENDAR   events from calendar.txt, today .. today+CAL_DAYS
+    TODO       open  :todo:    lines from LIFE.TXT
+    WAITING    open  :waiting: lines from LIFE.TXT
+    DUE        due:DATE items from LIFE.TXT, surfaced AGENDA_LEAD days
+               early, loud once due or overdue
+    (:someday: and :dropped: never appear here -- agenda only matches
+     :todo: and :waiting:, by design)
+
+OPTIONS
+    -o, --only SECTION    print one section only
+                             cal | calendar   calendar only
+                             life             todo+waiting+due (no calendar)
+                             todo             open todos only
+                             waiting          open waiting-on's only
+                             due              due: items only
+                           default: all sections
+    -c, --cal-days N      calendar horizon in days ahead     default 7
+    -l, --agenda-lead N   due-soon lead time in days          default 2
+    -h, --help            flag summary (built into the script itself)
+
+    precedence: CLI flag  >  env var  >  built-in default
+
+ENVIRONMENT
+    LIFE_DIR     base dir                    default ~/life
+    LIFE_FILE    LIFE.TXT path                default $LIFE_DIR/LIFE.TXT
+    CAL_FILE     calendar.txt path            default $LIFE_DIR/stacks/calendar.txt
+    CAL_DAYS     same as -c                   default 7
+    AGENDA_LEAD  same as -l                   default 2
+
+DUE MARKERS
+    [DUE IN Nd]    due:DATE is inside the lead window, not due yet
+    [DUE TODAY]    due:DATE == today
+    [OVERDUE Nd]   due:DATE was Nd days ago
+    Marker plus a leading ! render reverse-video on a tty; both fall
+    back to plain ASCII automatically when piped (agenda | less,
+    agenda > file) -- output is always strict ASCII, no box-drawing.
+
+EXAMPLES
+    agenda                  daily glance, everything
+    agenda --only cal       what's on the calendar
+    agenda --only life      LIFE.TXT items only (todo+waiting+due)
+    agenda -o waiting       what am I blocked on
+    agenda -c 30            monthly sweep of the calendar
+    agenda -c 30 -l 5       wider horizon + earlier due-soon warning
+
+FILES
+    ~/life/LIFE.TXT               journal / notes / :tag: items -- see
+                                   its own legend block for tag conventions
+    ~/life/stacks/calendar.txt    dated events only, chronological, @tag
+
+DEPLOYMENT
+    machine-setup repo:  bin/agenda  -->  symlink  ~/.local/bin/agenda
+    shell startup (.bashrc):  command -v agenda >/dev/null && agenda
+---------------------

@@ -35,16 +35,17 @@ never under version control here.
 
 ## Layout
 
-| Directory        | Holds                                                    | Deploys to                                      |
-|------------------|----------------------------------------------------------|-------------------------------------------------|
-| `shell/`         | Shell startup & aliases (`.bashrc`, `.profile`, etc.)    | symlinked into `~/`                             |
-| `wayland/`       | Wayland compositor configs, grouped by desktop/WM        | (parent; see below)                             |
-| `wayland/gnome/` | GNOME setup scripts (e.g. workspace keybindings)         | run on demand; not on `PATH`                    |
-| `config/`        | Files destined for XDG config (e.g. `environment.d/`)    | copied/symlinked into `~/.config/`              |
-| `bin/`           | Utility scripts run as everyday commands (e.g. `agenda`) | symlinked into `~/.local/bin/` (on `PATH`)      |
-| `x11/`           | X11/FVWM3 bits for the FreeBSD machines                  | symlinked into `~/`                             |
-| `templates/`     | Skeleton/example personal-data files (`*.example`)       | **copied** as seeds, only if absent (see below) |
-| `setup/`         | Bootstrap script(s) that deploy everything above         | run manually on a new machine                   |
+| Directory        | Holds                                                       | Deploys to                                       |
+|------------------|--------------------------------------------------------------|---------------------------------------------------|
+| `shell/`         | Shell startup & aliases (`.bashrc`, `.profile`, etc.)       | symlinked into `~/`                                |
+| `wayland/`       | Wayland compositor configs, grouped by desktop/WM           | (parent; see below)                                |
+| `wayland/gnome/` | GNOME setup scripts (e.g. workspace keybindings)            | run on demand; not on `PATH`                       |
+| `config/`        | Files destined for XDG config (e.g. `environment.d/`)       | copied/symlinked into `~/.config/`                 |
+| `bin/`           | Utility scripts run as everyday commands (e.g. `agenda`)    | symlinked into `~/.local/bin/` (on `PATH`)         |
+| `doc/`           | Reference docs for repo tooling (e.g. `agenda` cheatsheet)  | not deployed - reference only                      |
+| `x11/`           | X11/FVWM3 bits for the FreeBSD machines                     | symlinked into `~/`                                |
+| `templates/`     | Skeleton/example personal-data files (`*.example`)          | **copied** as seeds, only if absent (see below)    |
+| `setup/`         | Bootstrap script(s) that deploy everything above             | run manually on a new machine                      |
 
 > Layout is descriptive of intent - add or drop directories as the repo grows.
 > The guiding rule: split by **lifecycle/deployment**, not by file type. Things
@@ -92,4 +93,5 @@ Three deploy verbs, by kind of file:
   it lives in `~/life/` under Syncthing + backup.
 - Reversible config scripts include a `--reset` mode and print BEFORE/AFTER
   snapshots, so each run leaves an auditable trail of what changed.
-
+- Reference docs under `doc/` are not deployed - `install.sh` never touches
+  them; they're browsed/`grep`ped in place, not symlinked or copied anywhere.
