@@ -63,6 +63,19 @@ These have no dnf package on RHEL 10 and are built from upstream. Build deps
   ```
 - **Claws Mail** - built from source on RHEL 10 (not in EPEL 10).
   # (add build steps / upstream pointer)
+- **ttyp0 (UW ttyp0)** - bitmap font used by xterm in `dot.Xresources.desktop`
+  (`XTerm*font: -uw-ttyp0-...`). Confirmed NOT packaged on RHEL 10
+  (`dnf search ttyp0` -> no matches); without it xterm falls back to `fixed`.
+  Upstream: search for "uw-ttyp0" (Uwe Waldmann) - VERIFY current URL before
+  building. Build is BDF->PCF via make; install fonts, run mkfontdir, add the
+  directory to the font path. (Fill in exact steps on first successful build.)
+- **XCursor-Pro (Decay theme)** - cursor theme referenced by
+  `Xcursor.theme: Xcursor-Pro-Decay` in `dot.Xresources.desktop`. Confirmed
+  NOT packaged on RHEL 10 (`dnf search decay` -> no matches); if absent, the
+  resource is silently ignored (default cursor used). Manual install: download
+  a release from the XCursor-Pro project (VERIFY current upstream, likely on
+  GitHub) and unpack the theme into `~/.icons/` (per-user) or
+  `/usr/share/icons/` (system-wide).
 
 ---
 
