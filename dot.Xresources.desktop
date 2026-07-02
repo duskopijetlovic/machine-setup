@@ -1,0 +1,248 @@
+! To save the changes, after editing:
+! a) To re-read your Xresources file, and throw away your old resources, run
+! $ xrdb ~/.Xresources
+! or
+! b) To re-read your Xresources file, and keep your old resources, run
+! $ xrdb -merge ~/.Xresources
+!!! --------------------------------------------------------------------------
+
+XTerm*saveLines: 1048576
+XTerm*loginShell: true
+XTerm*charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
+XTerm*eightBitInput: false
+XTerm*cursorBlink: true
+XTerm*scrollKey: true
+XTerm*scrollTtyOutput: false
+XTerm*selectToClipboard: true
+
+!!! Colours {{{
+!XTerm*colorBD: White
+!XTerm*colorBDMode: true XTerm*colorUL: Yellow
+XTerm*colorULMode: true
+XTerm*cursorColor: Cyan
+XTerm*background: Black
+XTerm*foreground: White
+XTerm*borderWidth: 2
+! Tried: Red, Yellow, Slategray, gray50 !
+XTerm*borderColor: gray50
+XTerm*colorInnerBorder: true
+!!! }}}
+
+! From: http://www.freebsdwiki.net/index.php/Unicode
+! Works!
+!!! Encoding {{{
+XTerm*locale: UTF-8
+!!! }}}
+
+!!! Fonts - X Core fonts
+!!! AKA  XLFD (X Logical Font Description) 
+!!! AKA  Classic fonts
+!!! AKA  old style fonts
+!!! AKA  X11 fonts
+!!! AKA  normal text font (in man xterm)
+!!! AKA  VTFonts, or  VT (In output from:  xterm -report-font)
+!--------------------------------------------------------------------------
+! NOTE: ttyp0 is a third-party bitmap font, NOT in xorg-x11-fonts-misc and
+! not packaged on RHEL 10. If absent, xterm prints "cannot load font" and
+! falls back to "fixed" (verify with: xterm -report-fonts). Either install
+! ttyp0 manually (see setup/packages.md, from-source section) or accept the
+! fixed fallback on machines without it.
+!--------------------------------------------------------------------------
+XTerm*font: -uw-ttyp0-medium-r-normal--17-160-75-75-c-90-iso10646-1
+
+!!! }}}
+
+!!! Fonts - New style {{{
+!!! AKA  FreeType fonts, or OpenType Font (OTF), TrueType Font (TTF) 
+!!! AKA  XftFonts
+!!! AKA  Scalable fonts
+!!! AKA  Fontconfig system 
+!!! For new styel, use XTerm*faceName, as below:
+/* Set a font and styles */
+!XTerm*faceName: xft:FiraCode-Regular:antialias=true:size=14
+/* Set a CJK font and styles */
+!!! Tested all fonts below and all of them worked.
+!!!   With locale LC_CTYPE set in tcsh shell first:
+!!!      setenv LC_CTYPE ja_JP.UTF-8
+!XTerm*faceNameDoublesize: xft:NanumGothicCoding
+!XTerm*faceNameDoublesize: VL Gothic:style=regular:antialias=true
+!XTerm*faceNameDoublesize: WenQuanYi WenQuanYi Bitmap Song
+!XTerm*faceNameDoublesize: WenQuanYi Micro Hei Mono:antialias=True:pixelsize=18
+!XTerm*faceNameDoublesize: WenQuanYi Micro Hei:antialias=True:pixelsize=14
+!XTerm*faceNameDoublesize: Misc-Fixed-Wide
+!XTerm*faceNameDoublesize: NanumGothicCoding:size=12
+XTerm*faceNameDoublesize: Noto Serif CJK JP
+!!! }}}
+
+
+Xcursor.size: 32 
+!--------------------------------------------------------------------------
+! NOTE: Xcursor-Pro-Decay is a third-party cursor theme, not packaged on
+! RHEL 10 - install manually (theme files under ~/.icons or
+! /usr/share/icons; see setup/packages.md, from-source/manual section).
+! If absent, this resource is silently ignored and the default cursor
+! theme is used.
+!--------------------------------------------------------------------------
+Xcursor.theme: Xcursor-Pro-Decay
+
+
+!!! Colours2 {{{
+
+! Mikazuki colour theme
+! From browsing and generating colour schemes at
+!   https://terminal.sexy/
+! Go to Scheme Browser > /xcolors.net/mikazuki
+!
+! Also, found it here:
+!  https://github.com/janoamaral/Xresources-themes
+!  https://github.com/janoamaral/Xresources-themes/blob/master/xcolors-mikazuki.Xresources
+
+! special
+*.foreground:   #ffffff
+*.background:   #000000
+*.cursorColor:  #ffffff
+
+! black
+*.color0:       #2a1d17
+*.color8:       #4f362b
+
+! red
+*.color1:       #da1657
+*.color9:       #da4375
+
+! green
+*.color2:       #3ea250
+*.color10:      #6cb87a
+
+! yellow
+*.color3:       #e3d33d
+*.color11:      #e3da84
+
+! blue
+*.color4:       #3ea290
+*.color12:      #8ca8a3
+
+! magenta
+*.color5:       #ff850d
+*.color13:      #ffa64f
+
+! cyan
+*.color6:       #8c16da
+*.color14:      #a167c7
+
+! white
+*.color7:       #e9e9e9
+*.color15:      #fdfdfd
+
+!!! }}}
+
+
+! 2023-09-26
+! Commented this out
+! REASON: With the initialFont set to 5, xterm was not showing fonts properly
+!
+! Scaling default xterm font to "Large"
+! https://unix.stackexchange.com/questions/675000/scaling-default-xterm-font-to-large
+!
+! You can also test this out, before modifying your .Xresources file,
+! using the -xrm option:
+!   xterm -xrm 'xterm*VT100.initialFont:5'
+!
+! And merge them in via:
+!   xrdb -merge ~/.Xresources
+!     or
+!   xrdb -merge ~/.Xdefaults
+! depending upon the file you happen to use.
+!xterm*VT100.initialFont: 5
+
+!!! Nice Fonts - FreeBSD Forums
+! https://forums.freebsd.org/threads/howto-nice-fonts.2021/page-2
+!     and
+! [Solved] Ugly fonts on some websites - FreeBSD Forums
+! https://forums.freebsd.org/threads/ugly-fonts-on-some-websites.61501/
+!    and
+! Firefox fonts jagged and ugly - FreeBSD Forums
+! https://forums.freebsd.org/threads/firefox-fonts-jagged-and-ugly.63964/
+
+Xft.dpi:                                108
+!!!Xft.dpi:                                120
+Xft.autohint:                           0
+Xft.antialias:                          1
+Xft.hinting:                            1
+Xft.rgba:                               rgb
+Xft.hintstyle:                          hintslight
+Xft.lcdfilter:                          lcddefault
+!!! }
+
+! "X Window System User's Guide (Motiff Edition) - Volume Three"
+! "(c) 1991, 1993 O'Reilly and Associates, Inc."
+! NOTE: mouse-button bindings moved into the single merged translations
+! block at the end of this file. X resources do NOT merge multiple
+! translations tables for the same widget - only one wins - so all
+! bindings must live in ONE #override block.
+
+! Lines beginning with ! or included in  /*string here*/ are
+! comments and are ignored:
+! This is a Comment
+! /*This is a Comment*/
+! /*-No-white-space-start-or-end-of-any-line-*/
+!{{{ XMESSAGE
+!Xmessage*font:        -xos4-terminus-medium-*-*-*-12-*-*-*-*-*-iso8859-2
+!Xmessage*geometry:    +200+200
+!Xmessage*background:  gray85
+!Xmessage*foreground:  gray15
+
+
+Xmessage*Scrollbar.thumb:               vlines2
+Xmessage*Scrollbar.width:               2
+!Xmessage*Scrollbar.foreground:          rgb:a/5/5
+!Xmessage*Scrollbar.borderWidth:         0
+!Xmessage*Scrollbar.displayList:\
+!foreground      gray90;\
+!lines           1,-1,-1,-1,-1,1;\
+!foreground      gray60;\
+!lines           -1,0,0,0,0,-1
+
+! add keyboard shortcuts to jump to beginning/end
+! NOTE: moved into the merged translations block at the end of this file.
+
+! Change font size in xterm using keyboard
+! https://blog.rot13.org/2010/03/change-font-size-in-xterm-using-keyboard.html
+!
+! Alt and + = increase xterm font size
+! Alt and - = decrease xterm font size
+! Alt and y = reverse video (exchange background to foreground color)
+!
+! ===========================================================================
+! MERGED translations block - the ONLY translations resource in this file.
+! (X resources do not merge multiple translations tables for one widget;
+! only one wins. Formerly three separate blocks: mouse/F3/dzen2 bindings,
+! Shift-Home/End scrolling, and Alt/Super font sizing - now combined.)
+!
+! Mouse notes:  !Shift <Btn2Up> = Shift+Button2 pastes CLIPBOARD;
+!               ~Shift ~Ctrl ~Meta <Btn2Up> = plain Button2 pastes PRIMARY.
+!               (In translation tables a leading ! means: exactly these
+!               modifiers - it is NOT a comment.)
+! Scroll notes: Shift-Home/End directions kept as they were in the original
+!               file (forw on Home, back on End) - swap if they feel inverted.
+! ===========================================================================
+XTerm*vt100.translations: #override \
+  Button1 <Btn3Down>: select-end(PRIMARY,CUT_BUFFER0,CLIPBOARD) \n\
+  !Shift <Btn2Up>: insert-selection(CLIPBOARD) \n\
+  ~Shift ~Ctrl ~Meta <Btn2Up>: insert-selection(PRIMARY,CUT_BUFFER0) \n\
+  <Key>F3: string("cd ~/scratch/tmpscratch2") string(0x0d) \n\
+  Alt <Key>g: string("date | dzen2 -xs 2 -p 5 -bg blue") string(0x0d) \n\
+  Shift <Key>Home: scroll-forw(10000000000) \n\
+  Shift <Key>End: scroll-back(10000000000) \n\
+  Meta <Key>minus: smaller-vt-font() \n\
+  Meta <Key>plus: larger-vt-font() \n\
+  Meta <Key>y: set-reverse-video() \n\
+  Meta <Key>KP_Subtract: smaller-vt-font() \n\
+  Meta <Key>KP_Add: larger-vt-font() \n\
+  Super <Key>minus: smaller-vt-font() \n\
+  Super <Key>plus: larger-vt-font() \n\
+  Super <Key>KP_Subtract: smaller-vt-font() \n\
+  Super <Key>KP_Add: larger-vt-font()
+
+
+!!! --------------------------------------------------------------------------
