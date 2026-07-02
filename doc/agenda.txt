@@ -5,6 +5,15 @@ NAME
 
 SYNOPSIS
     agenda [-o|--only SECTION] [-c|--cal-days N] [-l|--agenda-lead N] [-h|--help]
+    agenda tags
+
+SUBCOMMANDS
+    tags       every :tag: in use in LIFE.TXT, with counts, most
+               frequent first. A tag is a lowercase/underscore word
+               between colons; chained tags (:a:b:c:) each count.
+               Tags never need remembering, only discovering -- this
+               is the file listing its own vocabulary. Legend block
+               at the top of LIFE.TXT holds the meanings.
 
 SECTIONS PRINTED
     CALENDAR   events from calendar.txt, today .. today+CAL_DAYS
@@ -52,6 +61,7 @@ DUE MARKERS
 
 EXAMPLES
     agenda                  daily glance, everything
+    agenda tags             which tags exist, and how often used
     agenda --only cal       what's on the calendar
     agenda --only life      LIFE.TXT items only (todo+waiting+due)
     agenda -o waiting       what am I blocked on
@@ -62,6 +72,7 @@ GREP RECIPES
     For lookups agenda's own flags don't cover -- past the horizon, or
     narrowed by keyword instead of by section. Tag-axis greps (state/
     area/project) live in LIFE.TXT's own legend block, not here.
+    Can't recall a tag's exact spelling? Start with: agenda tags
 
     Narrow agenda's live view by keyword:
         agenda | grep -i "dentist"

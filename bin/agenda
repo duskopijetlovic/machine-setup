@@ -9,6 +9,9 @@
 #      lead-time window (today + AGENDA_LEAD days) or overdue, flagged LOUD,
 #      so date-triggered follow-ups surface with time to act.
 #
+# Also: 'agenda tags' lists every :tag: in use in LIFE.TXT, with counts,
+# most frequent first — the file remembers the tags so you don't have to.
+#
 # You only ever RUN this; you never have to check the files individually.
 # Edit the files directly with vi when you have something to add.
 #
@@ -32,9 +35,16 @@ ONLY="${ONLY:-all}"              # which section(s) to show; "all" = everything
 usage() {
     cat <<USAGE
 Usage: agenda [options]
+       agenda tags
 
   One unified daily view over your plain-text life:
   calendar events, open :todo:/:waiting: items, and due: follow-ups.
+
+Subcommands:
+  tags                  List every :tag: in use in LIFE.TXT, with counts,
+                        most frequent first. A tag is a lowercase/underscore
+                        word between colons; chained tags (:a:b:c:) each
+                        count. See the tag registry at the top of LIFE.TXT.
 
 Options:
   -o, --only SECTION    Show only one section. SECTION is one of:
@@ -53,6 +63,7 @@ which override the built-in defaults.
 
 Examples:
   agenda                       # daily glance, all sections
+  agenda tags                  # every tag in use, with counts
   agenda --only cal            # calendar items only
   agenda --only life           # LIFE.TXT items only (todo+waiting+due)
   agenda --cal-days 30         # one-off monthly sweep
@@ -62,12 +73,33 @@ Full reference: agenda.txt (in 'machine-setup' repo -> doc/agenda.txt)
 USAGE
 }
 
+# ---- Subcommand: tags -----------------------------------------------------
+# List all tags in use, with counts, most frequent first.
+# A tag is a lowercase/underscore word between colons; chained tags
+# (:a:b:c:) are each counted — awk splits on ":" and tests every interior
+# field, so adjacent tags never swallow each other's delimiters (which is
+# why this is awk and not grep -o). Empty fields (::) and non-tag colon
+# text (URLs, times, "x :: y" registry lines) fail the field test, so they
+# never show up. Scans LIFE.TXT only: tags live there by design.
+# Reasoning: tags never need to be *remembered*, only discoverable —
+# this command is the system remembering its own vocabulary for you.
+cmd_tags() {
+    if [ ! -f "$LIFE_FILE" ]; then
+        echo "agenda: no LIFE.TXT at $LIFE_FILE" >&2
+        return 1
+    fi
+    awk -F: '{ for (i = 2; i < NF; i++)
+                 if ($i ~ /^[a-z_]+$/) print ":" $i ":" }' "$LIFE_FILE" \
+      | sort | uniq -c | sort -rn
+}
+
 # ---- Parse command-line options (override env/defaults) -----------------
 # POSIX-portable parsing of both --long val, --long=val, and short -x val.
 is_posint() { case "$1" in ''|*[!0-9]*) return 1 ;; *) return 0 ;; esac; }
 
 while [ $# -gt 0 ]; do
     case "$1" in
+        tags)             cmd_tags; exit $? ;;
         -l|--agenda-lead) AGENDA_LEAD="$2"; shift 2 ;;
         --agenda-lead=*)  AGENDA_LEAD="${1#*=}"; shift ;;
         -c|--cal-days)    CAL_DAYS="$2"; shift 2 ;;
