@@ -19,7 +19,7 @@ This repository holds **machinery** - configuration, scripts, and the bootstrap
 that deploys them. It does **not** hold **personal data**.
 
 Plain-text personal data (calendar, todos, journal, waiting-fors - e.g.
-`~/life/LIFE.TXT`, `~/life/stacks/calendar.txt`) lives **outside this repo**, in
+`~/life/LIFE.TXT`, `~/life/calendar.txt`) lives **outside this repo**, in
 the sync + backup layer (Syncthing across machines, Borg/restic for backups).
 Reasons this separation is strict:
 
@@ -37,7 +37,7 @@ never under version control here.
 
 | Directory        | Holds                                                       | Deploys to                                       |
 |------------------|--------------------------------------------------------------|---------------------------------------------------|
-| `shell/`         | Shell startup & aliases (`.bashrc`, `.profile`, etc.)       | symlinked into `~/`                                |
+| `dotfiles/`      | All dotfiles, stored with a `dot.` prefix (`dot.vimrc`, `dot.exrc`, `dot.Xresources.*`, ...) | symlinked into `~/` as `.name`                     |
 | `wayland/`       | Wayland compositor configs, grouped by desktop/WM           | (parent; see below)                                |
 | `wayland/gnome/` | GNOME setup scripts (e.g. workspace keybindings)            | run on demand; not on `PATH`                       |
 | `config/`        | Files destined for XDG config (e.g. `environment.d/`)       | copied/symlinked into `~/.config/`                 |
@@ -51,6 +51,13 @@ never under version control here.
 > The guiding rule: split by **lifecycle/deployment**, not by file type. Things
 > set up together in one pass on a new machine live here together, organized by
 > directory rather than by separate repositories.
+
+**Dotfile naming convention:** files in `dotfiles/` are stored as `dot.name`
+(visible in plain `ls`, no leading-dot hiding) and deployed as `~/.name` -
+e.g. `dotfiles/dot.vimrc` -> `~/.vimrc`. Per-machine variants use a suffix:
+`dot.Xresources.desktop`, `dot.Xresources.laptop` (the bootstrap picks the
+right variant per machine). Future shell startup files (`dot.bashrc`,
+`dot.profile`, `dot.tcshrc`, ...) follow the same convention and live here too.
 
 ## Setup vs. utility scripts
 
@@ -75,7 +82,7 @@ $ ./setup/install.sh               # create symlinks / copy config into place
 
 Three deploy verbs, by kind of file:
 
-- **Symlink** - things edited in-repo (shell rc files, utility scripts) are
+- **Symlink** - things edited in-repo (dotfiles, utility scripts) are
   symlinked so the repo stays the master copy.
 - **Copy** - config that must be a real file at its destination is copied.
 - **Seed (copy-once, never overwrite)** - `templates/*.example` files are
