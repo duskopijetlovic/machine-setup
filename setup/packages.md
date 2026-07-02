@@ -34,9 +34,12 @@ $ sudo dnf install \
   gcc \
   make \
   xterm \
-  xorg-x11-fonts-misc
+  xorg-x11-fonts-misc \
+  xrdb
   # xorg-x11-fonts-misc: traditional X bitmap fonts (fixed 6x13 etc.) - the
   # classic xterm look; weak dep of xterm, listed explicitly so it's guaranteed
+  # xrdb: loads ~/.Xresources (xterm colors/fonts/keybindings); XWayland apps
+  # read it. Run after login or config change:  xrdb ~/.Xresources
   # ... add the rest of your everyday packages
 ```
 
