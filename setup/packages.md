@@ -32,7 +32,11 @@ $ sudo dnf install \
   gnome-screenshot-tool \
   readline-devel \
   gcc \
-  make
+  make \
+  xterm \
+  xorg-x11-fonts-misc
+  # xorg-x11-fonts-misc: traditional X bitmap fonts (fixed 6x13 etc.) - the
+  # classic xterm look; weak dep of xterm, listed explicitly so it's guaranteed
   # ... add the rest of your everyday packages
 ```
 
@@ -86,4 +90,6 @@ Notes on FreeBSD name differences vs RHEL:
 | Cron                 | cronie                 | (base system)    | cron is in FreeBSD base        |
 | Calendar reminders   | remind (from source)   | remind (pkg)     | not in EPEL 10; source on RHEL |
 | Screenshot           | gnome-screenshot-tool  | (n/a — X11)      | Wayland-native on RHEL         |
+| X terminal           | xterm                  | xterm            | runs via XWayland on RHEL      |
+| Classic X bitmap fonts | xorg-x11-fonts-misc  | xorg-fonts       | xterm's default `fixed` font; verify FreeBSD pkg name |
 | (add rows as you go) |                        |                  |                                |
