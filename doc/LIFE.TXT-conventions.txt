@@ -1,0 +1,48 @@
+:tag: CONVENTIONS
+---------------------
+Tags are keywords enclosed in colons, opened AND closed: :like_this:
+Lowercase, underscores for spaces. Every tag opens and closes with a colon.
+State:  :todo: :waiting: :done: :someday: :dropped:
+        (grep ':todo:' LIFE.TXT  finds all open actions; swap state as needed)
+Area:   :work: :health: :career: :family:
+        (grep ':health:' LIFE.TXT  finds all entries in that area)
+Kind:   :reference:   non-actionable lookup data (measurements, specs, etc.)
+        (grep ':reference:' LIFE.TXT  lists all; agenda ignores these by design)
+Project:  :project_NAME:
+          (grep -o ':project_[a-z0-9_]*:' LIFE.TXT | sort -u  lists all)
+Dated:  :todo: with  due:YYYY-MM-DD
+        (grep 'due:' LIFE.TXT  finds all; grep 'due:2026-' for a year)
+No contexts (@home/@errands): tasks aren't location-gated here.
+Area covers grouping; reintroduce :context_NAME: only if real location-batching
+ever appears.
+***                                 ***                                    ***
+:project: CONVENTIONS
+A :project_NAME: _outcome_ sentence is written at _creation_, describes a checka
+ble _end-state_, and does not get upgraded.
+Basically, it's defining "done".
+When reality matches the words as originally written, it's :done: - even if you
+can now imagine a better version.
+_Especially_then.
+Projects (mostly) don't have due:, and that's the correct default.
+A :project_NAME: is an outcome, and outcomes mostly don't have deadlines.
+What carries the due: is the next action underneath it.
+For example, for a :project_long_term_investing: portfolio set up, funded, and o
+n a contribution schedule, that next action would be :todo: open brokerage accou
+nt due:2026-07-17
+Each project's definition line (outcome sentence, no :todo:/:due:) needs :someda
+y: tag too so the project is not missed at the next :someday: review; action lin
+es already surface via TODO/DUE and don't get :someday: tag.
+***                                 ***                                    ***
+:someday: REVIEW RULE
+---------------------
+Review :someday: ONLY on a scheduled date, set in advance.
+Frequency: quarterly
+Review length: 15 minutes
+Trust the process.
+Allow imperfection.
+Allow :someday: items to drop.
+***                                 ***                                    ***
+The heuristic: if you'd naturally say "I need to do X by/on [date]" -> LIFE.TXT
+:todo: + due:.
+If you'd say "X is happening at [time] on [date]" -> calendar.txt.
+***                                 ***                                    ***
