@@ -17,21 +17,15 @@ Area covers grouping; reintroduce :context_NAME: only if real location-batching
 ever appears.
 ***                                 ***                                    ***
 :project: CONVENTIONS
-A :project_NAME: _outcome_ sentence is written at _creation_, describes a checka
-ble _end-state_, and does not get upgraded.
+A :project_NAME: _outcome_ sentence is written at _creation_, describes a checkable _end-state_, and does not get upgraded.
 Basically, it's defining "done".
-When reality matches the words as originally written, it's :done: - even if you
-can now imagine a better version.
+When reality matches the words as originally written, it's :done: - even if you can now imagine a better version.
 _Especially_then.
 Projects (mostly) don't have due:, and that's the correct default.
 A :project_NAME: is an outcome, and outcomes mostly don't have deadlines.
 What carries the due: is the next action underneath it.
-For example, for a :project_long_term_investing: portfolio set up, funded, and o
-n a contribution schedule, that next action would be :todo: open brokerage accou
-nt due:2026-07-17
-Each project's definition line (outcome sentence, no :todo:/:due:) needs :someda
-y: tag too so the project is not missed at the next :someday: review; action lin
-es already surface via TODO/DUE and don't get :someday: tag.
+For example, for a :project_long_term_investing: portfolio set up, funded, and on a contribution schedule, that next action would be :todo: open brokerage account due:2026-07-17
+Each project's definition line (outcome sentence, no :todo:/:due:) needs :someday: tag too so the project is not missed at the next :someday: review; action lines already surface via TODO/DUE and don't get :someday: tag.
 ***                                 ***                                    ***
 :someday: REVIEW RULE
 ---------------------
@@ -42,7 +36,6 @@ Trust the process.
 Allow imperfection.
 Allow :someday: items to drop.
 ***                                 ***                                    ***
-The heuristic: if you'd naturally say "I need to do X by/on [date]" -> LIFE.TXT
-:todo: + due:.
+The heuristic: if you'd naturally say "I need to do X by/on [date]" -> LIFE.TXT :todo: + due:.
 If you'd say "X is happening at [time] on [date]" -> calendar.txt.
 ***                                 ***                                    ***
