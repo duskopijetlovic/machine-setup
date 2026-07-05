@@ -13,8 +13,7 @@ Project:  :project_NAME:
 Dated:  :todo: with  due:YYYY-MM-DD
         (grep 'due:' LIFE.TXT  finds all; grep 'due:2026-' for a year)
 No contexts (@home/@errands): tasks aren't location-gated here.
-Area covers grouping; reintroduce :context_NAME: only if real location-batching
-ever appears.
+Area covers grouping; reintroduce :context_NAME: only if real location-batching ever appears.
 ***                                 ***                                    ***
 :project_NAME: CONVENTIONS
 A :project_NAME: _outcome_ sentence is written at _creation_, describes a checkable _end-state_, and does not get upgraded.
