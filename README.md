@@ -102,3 +102,7 @@ Three deploy verbs, by kind of file:
   snapshots, so each run leaves an auditable trail of what changed.
 - Reference docs under `doc/` are not deployed - `install.sh` never touches
   them; they're browsed/`grep`ped in place, not symlinked or copied anywhere.
+- Per-host hardware/display quirks live in `doc/hosts/<hostname>.md` and are
+  **not portable** - never copy a fix from one host file to another without
+  confirming it applies (e.g. rhel1's NVIDIA notes do not apply to the
+  ThinkPads).
