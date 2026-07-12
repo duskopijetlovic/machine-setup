@@ -35,12 +35,25 @@ $ sudo dnf install \
   make \
   xterm \
   xorg-x11-fonts-misc \
-  xrdb
+  xrdb \
+  aspell \
+  keepassxc \
+  thunderbird \
+  firefox \
+  chromium
   # xorg-x11-fonts-misc: traditional X bitmap fonts (fixed 6x13 etc.) - the
   # classic xterm look; weak dep of xterm, listed explicitly so it's guaranteed
   # xrdb: loads ~/.Xresources (xterm colors/fonts/keybindings); XWayland apps
   # read it. Run after login or config change:  xrdb ~/.Xresources
   # ... add the rest of your everyday packages
+```
+
+### Third-party repo: Brave browser
+Brave is not in the RHEL repos; add its repo and key first, then install:
+```
+$ sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+$ sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+$ sudo dnf install brave-browser
 ```
 
 ### From EPEL (requires EPEL+CRB enabled, above)
@@ -86,12 +99,23 @@ $ sudo pkg install \
   libreoffice \
   vim \
   remind \
+  aspell \
+  keepassxc \
+  thunderbird \
+  firefox \
+  chromium
   # ... add the rest
 ```
 
 Notes on FreeBSD name differences vs RHEL:
 - `vim-enhanced` (RHEL)  ->  `vim` (FreeBSD)
 - `remind` is packaged in FreeBSD ports (unlike EPEL 10, where it's source-built)
+- **Brave**: not in the standard install line above.
+  - RHEL: needs Brave's third-party repo + key first (see RHEL section);
+    package name `brave-browser` (native).
+  - FreeBSD: packaged as `linux-brave` (the Linux binary under FreeBSD's
+    Linux emulation - NOT a native build; Origin www/linux-brave). Install:
+    `sudo pkg install linux-brave`  (requires the Linux compat layer enabled).
 - (add others as you discover them)
 
 ---
@@ -108,4 +132,10 @@ Notes on FreeBSD name differences vs RHEL:
 | Screenshot           | gnome-screenshot-tool  | (n/a — X11)      | Wayland-native on RHEL         |
 | X terminal           | xterm                  | xterm            | runs via XWayland on RHEL      |
 | Classic X bitmap fonts | xorg-x11-fonts-misc  | xorg-fonts       | xterm's default `fixed` font; verify FreeBSD pkg name |
+| Spell checker        | aspell                 | aspell           | same name; may want language dict subpackages |
+| Password manager     | keepassxc              | keepassxc        | same name; opens the same .kdbx everywhere |
+| Mail client          | thunderbird            | thunderbird      | same name                      |
+| Browser (Firefox)    | firefox                | firefox          | same name                      |
+| Browser (Chromium)   | chromium               | chromium         | same name                      |
+| Browser (Brave)      | brave-browser (3rd-party repo) | linux-brave (Linux emu) | RHEL: add Brave repo+key first, native pkg. FreeBSD: Linux binary, needs Linux compat layer |
 | (add rows as you go) |                        |                  |                                |
