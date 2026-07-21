@@ -46,6 +46,27 @@ Dated:  :todo: with  due:YYYY-MM-DD   (due: is a key:value token, NOT a tag --
 No contexts (@home/@errands): tasks aren't location-gated here.
 Area covers grouping; reintroduce :context_NAME: only if real
 location-batching ever appears.
+
+ENTRY STRUCTURE
+An entry is delimited by a *** line; that is the ONLY entry boundary.
+  ***           = entry boundary (between entries only, never inside one)
+  blank line    = paragraph break WITHIN an entry (one idea per paragraph)
+  plain newline = semantic line break between sentences of one paragraph
+Semantic line breaks (one sentence per line, breaking at commas/semicolons
+  rather than randomly) follow Kernighan's advice in "UNIX for Beginners"
+  (1974): "Start each sentence on a new line. Make lines short, and break
+  lines at natural places ... rather than randomly." Keeps edits, diffs, and
+  greps landing per-sentence instead of reflowing whole paragraphs.
+Header line (first line of an entry) carries the date + tags and stays WHOLE:
+  format:  YYYY-MM-DD Day | text... :tag: :tag:   [due:YYYY-MM-DD]
+  Why whole: agenda is line-based -- :todo:/:waiting:/due: must sit together
+  on one line, or they parse as unrelated matches. So header = one line always.
+Continuation lines (after the header, until the next ***) are free prose:
+  use semantic line breaks and blank-line paragraphs as needed. agenda never
+  reads these, so structure them purely for future-you.
+Tag placement in multi-line entries: put tags on the HEADER line, so
+  grep ':reference:' LIFE.TXT  returns the dated line, not a mid-entry
+  fragment. (Same reason Project tags go on the header, not buried below.)
 ***                                 ***                                    ***
 ------------------
 
@@ -63,4 +84,13 @@ location-batching ever appears.
 2026-06-26 Fri | Example service double-charged; support ticket sent, awaiting reply; follow up, else dispute due:2026-06-29 :waiting:
 ***                                   ***                                    ***
 2026-06-28 Sun | Resolved: refund received, ticket closed :waiting: :done:
+***                                   ***                                    ***
+2026-06-29 Mon | Migrated the last machine to the new setup :reference:
+This entry shows the multi-line form:
+the header above carries the date and tag and stays on one line,
+while these continuation lines use semantic breaks.
+
+A blank line starts a new paragraph, one idea each.
+agenda ignores this entry entirely (:reference:),
+so it is structured purely for reading later.
 ***                                   ***                                    ***
