@@ -25,7 +25,6 @@ $ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.
 ### From the base/AppStream/CRB repos
 ```
 $ sudo dnf install \
-  libreoffice \
   vim-enhanced \
   tcsh \
   cronie \
@@ -40,13 +39,55 @@ $ sudo dnf install \
   keepassxc \
   thunderbird \
   firefox \
-  chromium
+  chromium \
+  lynx \
+  google-carlito-fonts
   # xorg-x11-fonts-misc: traditional X bitmap fonts (fixed 6x13 etc.) - the
   # classic xterm look; weak dep of xterm, listed explicitly so it's guaranteed
   # xrdb: loads ~/.Xresources (xterm colors/fonts/keybindings); XWayland apps
   # read it. Run after login or config change:  xrdb ~/.Xresources
+  # lynx: text-based web browser (base repo, exact match: `dnf search lynx`)
+  # google-carlito-fonts: Calibri metric-compatible sans-serif. Install this
+  # so LibreOffice renders Calibri .docx files with correct metrics/layout.
+  # (The orange "font substituted" warning in Writer stays - LibreOffice
+  # reports the REQUESTED font, not the substitute - but layout is faithful.)
+  # NOTE: RHEL name is google-carlito-fonts; FreeBSD calls it
+  # crosextrafonts-carlito (see FreeBSD section + name map).
   # ... add the rest of your everyday packages
 ```
+
+### LibreOffice on RHEL: official TDF RPMs (NOT a dnf repo package)
+LibreOffice is **absent from RHEL's default repos**; the distro `libreoffice`
+metapackage is not the install path here. Install the official Document
+Foundation (TDF) RPMs instead - this matches the auditable, rpm/dnf-queryable
+approach and is what the RHEL box actually runs (packages appear as
+`libreoffice26.2-*` / `libobasis26.2-*`, e.g. `dnf search libreoffice`).
+
+```
+# Download the current stable RPM tarball from documentfoundation.org
+# (keep the download wherever you stage installers; ~/Downloads is fine -
+#  the installer uses the extracted RPMs, not the tarball).
+$ cd ~/Downloads
+$ curl -LO https://download.documentfoundation.org/libreoffice/stable/<version>/rpm/x86_64/LibreOffice_<version>_Linux_x86-64_rpm.tar.gz
+# Optional integrity check: grab the matching .sha256 from the same dir, then
+#   sha256sum -c LibreOffice_<version>_Linux_x86-64_rpm.tar.gz.sha256
+
+$ tar xzf LibreOffice_<version>_Linux_x86-64_rpm.tar.gz
+$ cd LibreOffice_<version>*/RPMS
+$ sudo dnf install ./*.rpm     # RPMs hardcode /opt/libreoffice<major.minor>/;
+                               # you do NOT choose a target. desktop-integration
+                               # RPM (GNOME menus + MIME) is matched by ./*.rpm.
+```
+The TDF packages install under `/opt/libreoffice26.2/` and do **not** create a
+`/usr/bin/libreoffice` wrapper (that's a distro-repackaging convenience). The
+real entry point is `/opt/libreoffice26.2/program/soffice`; `.desktop` files
+call it by absolute path, so the GNOME app grid works. For a terminal-callable
+name, symlink it into `~/.local/bin/` (already on PATH, per-user, auditable):
+```
+$ ln -s /opt/libreoffice26.2/program/soffice ~/.local/bin/libreoffice
+```
+The target path carries the version (`libreoffice26.2`), so a future
+major.minor upgrade means re-pointing that symlink.
 
 ### Third-party repo: Brave browser
 Brave is not in the RHEL repos; add its repo and key first, then install:
@@ -103,13 +144,27 @@ $ sudo pkg install \
   keepassxc \
   thunderbird \
   firefox \
-  chromium
+  chromium \
+  lynx \
+  crosextrafonts-carlito
+  # lynx: text-based web browser. Plain `lynx` is the pkg you want -
+  # `pkg search lynx` also lists ja-lynx (multi-byte build) and lynx-current
+  # (development); don't grab those by mistake.
+  # crosextrafonts-carlito: Calibri metric-compatible font (RHEL calls it
+  # google-carlito-fonts). Same purpose - faithful Calibri .docx rendering.
   # ... add the rest
 ```
 
 Notes on FreeBSD name differences vs RHEL:
 - `vim-enhanced` (RHEL)  ->  `vim` (FreeBSD)
 - `remind` is packaged in FreeBSD ports (unlike EPEL 10, where it's source-built)
+- **LibreOffice**: FreeBSD has a single native pkg `libreoffice` (currently
+  26.2.4.2) - just `sudo pkg install libreoffice`. This is simpler than RHEL,
+  where LibreOffice is absent from the repos and installed from official TDF
+  RPMs into /opt (see RHEL LibreOffice section). Same suite, very different
+  install path per platform.
+- **carlito font**: `crosextrafonts-carlito` (FreeBSD) vs `google-carlito-fonts`
+  (RHEL) - different package names, same Calibri-metric-compatible font.
 - **Brave**: not in the standard install line above.
   - RHEL: needs Brave's third-party repo + key first (see RHEL section);
     package name `brave-browser` (native).
@@ -124,7 +179,7 @@ Notes on FreeBSD name differences vs RHEL:
 
 | Purpose              | RHEL 10 (dnf)          | FreeBSD 14 (pkg) | Notes                          |
 |----------------------|------------------------|------------------|--------------------------------|
-| Office suite         | libreoffice            | libreoffice      | same name                      |
+| Office suite         | (TDF RPMs, /opt)       | libreoffice      | RHEL: not in repos, official TDF RPMs -> /opt/libreoffice26.2. FreeBSD: native pkg |
 | Vim (full)           | vim-enhanced           | vim              | RHEL `vi` = vim-minimal (tiny) |
 | C-shell              | tcsh                   | (base system)    | tcsh is in FreeBSD base        |
 | Cron                 | cronie                 | (base system)    | cron is in FreeBSD base        |
@@ -138,4 +193,6 @@ Notes on FreeBSD name differences vs RHEL:
 | Browser (Firefox)    | firefox                | firefox          | same name                      |
 | Browser (Chromium)   | chromium               | chromium         | same name                      |
 | Browser (Brave)      | brave-browser (3rd-party repo) | linux-brave (Linux emu) | RHEL: add Brave repo+key first, native pkg. FreeBSD: Linux binary, needs Linux compat layer |
+| Browser (text)       | lynx                   | lynx             | same name; FreeBSD also has ja-lynx / lynx-current variants - use plain `lynx` |
+| Calibri-compat font  | google-carlito-fonts   | crosextrafonts-carlito | different names; same Carlito font for faithful Calibri .docx rendering |
 | (add rows as you go) |                        |                  |                                |
