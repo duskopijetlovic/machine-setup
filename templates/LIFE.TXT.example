@@ -2,13 +2,14 @@
 # LIFE.TXT  -  one big text file (OBTF): journal, ideas, notes, and todos,
 # in one chronological stream. Structure comes from :tags:, not separate files.
 #
-# Entry format:   YYYY-MM-DD Day | free text here :tag:tag:
+# Entry format:   YYYY-MM-DD Day | free text here :tag: :tag:
 # Separator:      a *** line between entries (visual only; agenda ignores it).
 #
-# Tag style: LIFE.TXT uses :tag: (Org-mode style). calendar.txt uses
-# @tag (todo.txt style). The difference is intentional - each file follows
-# its own lineage, and here the :tag: colons delimit tags within free-form
-# prose, where @ alone could be ambiguous against ordinary words.
+# Tag style: LIFE.TXT uses colon-delimited :tag: tokens, space-separated
+# (one token each: :todo: :work:), NOT chained (:todo:work:). The colons
+# delimit tags within free-form prose, where @ alone could be ambiguous
+# against ordinary words. calendar.txt uses @tag (todo.txt style) instead;
+# the difference is intentional - each file follows its own lineage.
 #
 # How agenda reads this file:
 #   open todo      = a line with :todo:    and NOT :done:
@@ -23,18 +24,43 @@
 # e.g. /mnt/usbflashdrive/life/LIFE.TXT on a machine using a USB drive.
 # ============================================================
 
+:tag: CONVENTIONS
+---------------------
+Tags are keywords enclosed in colons, opened AND closed: :like_this:
+Lowercase, underscores for spaces. Every tag opens and closes with a colon.
+Tags are space-separated, one token each: :todo: :work: -- NOT chained
+  org-mode style (:todo:work:). Deliberate + org-independent: adopting org
+  later means a full outline conversion, not a colon-syntax match; a clean
+  space-separated file converts more easily, not less. Decided; don't reopen.
+State:  :todo: :waiting: :done: :someday: :dropped:
+        (grep ':todo:' LIFE.TXT  finds all open actions; swap state as needed)
+Area:   :work: :health: :career: :family:
+        (grep ':health:' LIFE.TXT  finds all entries in that area)
+Kind:   :reference:   non-actionable lookup data (measurements, specs, etc.)
+        (grep ':reference:' LIFE.TXT  lists all; agenda ignores these by design)
+Project:  :project_NAME:
+          (grep -o ':project_[a-z0-9_]*:' LIFE.TXT | sort -u  lists all)
+Dated:  :todo: with  due:YYYY-MM-DD   (due: is a key:value token, NOT a tag --
+        no surrounding colons, always its own space-separated token)
+        (grep 'due:' LIFE.TXT  finds all; grep 'due:2026-' for a year)
+No contexts (@home/@errands): tasks aren't location-gated here.
+Area covers grouping; reintroduce :context_NAME: only if real
+location-batching ever appears.
+***                                 ***                                    ***
+------------------
+
 ***                                   ***                                    ***
-2026-05-12 Tue | Idea: write a short post on the RHEL 10 migration :blog:idea:
+2026-05-12 Tue | Idea: write a short post on the RHEL 10 migration :career: :someday:
 ***                                   ***                                    ***
 2026-05-14 Thu | Grateful the monitor toggle script works on the FreeBSD box.
 ***                                   ***                                    ***
 2026-06-01 Mon | Renew the domain before it lapses due:2026-06-20 :todo:
 ***                                   ***                                    ***
-2026-06-03 Wed | Old finished task, kept for the record :todo:done:
+2026-06-03 Wed | Old finished task, kept for the record :todo: :done:
 ***                                   ***                                    ***
-2026-06-10 Wed | Reference: rtw89_8852be is the Wi-Fi driver on the E14 :reference:hardware:
+2026-06-10 Wed | rtw89_8852be is the Wi-Fi driver on the E14 :reference:
 ***                                   ***                                    ***
 2026-06-26 Fri | Example service double-charged; support ticket sent, awaiting reply; follow up, else dispute due:2026-06-29 :waiting:
 ***                                   ***                                    ***
-2026-06-28 Sun | Resolved: refund received, ticket closed :waiting:done:
+2026-06-28 Sun | Resolved: refund received, ticket closed :waiting: :done:
 ***                                   ***                                    ***

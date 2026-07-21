@@ -4,9 +4,10 @@
 # OPTIONAL; add one when an entry is worth flagging or filtering later.
 #
 # Tag style: calendar.txt uses @tag (todo.txt style). LIFE.TXT uses
-# :tag: (Org-mode style). The difference is intentional - each file follows
-# its own lineage, and :tag: colons delimit tags within the free-form prose
-# of LIFE.TXT, where @ alone could be ambiguous.
+# colon-delimited :tag: tokens, space-separated. The difference is
+# intentional - each file follows its own lineage, and :tag: colons delimit
+# tags within the free-form prose of LIFE.TXT, where @ alone could be
+# ambiguous.
 #
 # View:  agenda     (today highlighted + upcoming; see: agenda --help)
 # Edit:  vi <path>/calendar.txt   - type a dated line anywhere, save.
