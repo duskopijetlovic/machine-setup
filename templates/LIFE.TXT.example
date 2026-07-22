@@ -52,6 +52,9 @@ An entry is delimited by a *** line; that is the ONLY entry boundary.
   ***           = entry boundary (between entries only, never inside one)
   blank line    = paragraph break WITHIN an entry (one idea per paragraph)
   plain newline = semantic line break between sentences of one paragraph
+The *** boundary is three asterisk-clusters on their own line; exact spacing
+  and column alignment are NOT significant -- recognizability is the whole job,
+  so don't fuss over aligning them or normalizing old ones.
 Semantic line breaks: start each sentence on its own line, breaking at
   sentence end (the period). Follows Kernighan, "UNIX for Beginners" (1974):
   "Start each sentence on a new line." (He also suggests breaking at commas/
