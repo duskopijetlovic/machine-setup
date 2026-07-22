@@ -4,16 +4,20 @@ NAME
     agenda -- unified daily view: calendar.txt events + LIFE.TXT open items
 
 SYNOPSIS
-    agenda [-o|--only SECTION] [-c|--cal-days N] [-l|--agenda-lead N] [-h|--help]
+    agenda [-o|--only SECTION] [-c|--cal-days N]
+           [-l|--agenda-lead N] [-h|--help]
     agenda tags
 
 SUBCOMMANDS
     tags       every :tag: in use in LIFE.TXT, with counts, most
                frequent first. A tag is a lowercase/underscore word
                between colons; chained tags (:a:b:c:) each count.
-               Tags never need remembering, only discovering -- this
-               is the file listing its own vocabulary. Legend block
-               at the top of LIFE.TXT holds the meanings.
+               Counts entry header lines only (see SECTIONS PRINTED),
+               so tags written in the legend to *explain* them are not
+               counted as usage. Tags never need remembering, only
+               discovering -- this is the file listing its own
+               vocabulary. Legend block at the top of LIFE.TXT holds
+               the meanings.
 
 SECTIONS PRINTED
     CALENDAR   events from calendar.txt, today .. today+CAL_DAYS
@@ -23,6 +27,11 @@ SECTIONS PRINTED
                early, loud once due or overdue
     (:someday: and :dropped: never appear here -- agenda only matches
      :todo: and :waiting:, by design)
+
+    Reads only ENTRY HEADER lines -- lines starting YYYY-MM-DD. The
+    legend and other documentation blocks in LIFE.TXT write tags
+    literally to explain them, so they would otherwise be reported as
+    real items; the date requirement excludes them wherever they sit.
 
 OPTIONS
     -o, --only SECTION    print one section only
@@ -86,6 +95,9 @@ GREP RECIPES
     due: dates past AGENDA_LEAD -- same idea, direct in LIFE.TXT:
         grep 'due:2026-08' ~/life/LIFE.TXT               # a given month
         grep 'due:2026-08-1[0-5]' ~/life/LIFE.TXT        # a date range
+
+    Note: greps run straight against LIFE.TXT see the whole file, so
+    they may match the legend/doc blocks that agenda itself skips.
 
 FILES
     ~/life/LIFE.TXT               journal / notes / :tag: items -- see its 
