@@ -25,13 +25,18 @@ LIFE_DIR="${LIFE_DIR:-$HOME/life}"
 LIFE_FILE="${LIFE_FILE:-$LIFE_DIR/LIFE.TXT}"
 CAL_FILE="${CAL_FILE:-$LIFE_DIR/calendar.txt}"
 
-# ---- helper: entries only — everything from the first *** separator on ----
-# The legend at the top of LIFE.TXT *documents* tags by writing them
-# literally (:todo:, :waiting:, due:YYYY-MM-DD), so a plain grep matches the
-# documentation as if it were data. Real entries start at the first ***, so
-# everything above that line is header and is skipped.
-body() {
-    awk '/^\*\*\*/ { seen = 1 } seen' "$1"
+# ---- helper: entry header lines only (lines starting YYYY-MM-DD) ---------
+# LIFE.TXT mixes DATA (entries) with DOCUMENTATION (the :tag: CONVENTIONS
+# legend, project/someday rule blocks, a kept-for-reference superseded format
+# spec). The docs *write tags literally* to explain them, so a plain grep
+# reports documentation as if it were a real item.
+#
+# The reliable discriminator is the date: every real entry begins with a
+# YYYY-MM-DD header line, and no documentation block does. Per the ENTRY
+# STRUCTURE rules in LIFE.TXT, tags and due: live on that header line
+# anyway -- so filtering to date-headed lines loses nothing actionable.
+entries() {
+    grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}' "$1" 2>/dev/null
 }
 
 # Defaults (lowest precedence). Order of precedence, lowest to highest:
@@ -90,6 +95,8 @@ USAGE
 # why this is awk and not grep -o). Empty fields (::) and non-tag colon
 # text (URLs, times, "x :: y" registry lines) fail the field test, so they
 # never show up. Scans LIFE.TXT only: tags live there by design.
+# Counts ENTRY HEADER lines only (see entries() above), so tags written in
+# the legend/doc blocks to *explain* them are not counted as usage.
 # Reasoning: tags never need to be *remembered*, only discoverable —
 # this command is the system remembering its own vocabulary for you.
 cmd_tags() {
@@ -97,7 +104,7 @@ cmd_tags() {
         echo "agenda: no LIFE.TXT at $LIFE_FILE" >&2
         return 1
     fi
-    body "$LIFE_FILE" \
+    entries "$LIFE_FILE" \
       | awk -F: '{ for (i = 2; i < NF; i++)
                      if ($i ~ /^[a-z_]+$/) print ":" $i ":" }' \
       | sort | uniq -c | sort -rn
@@ -169,7 +176,7 @@ fi
 open_lines() {  # $1 = tag without colons, e.g. todo
     tag=$1
     [ -f "$LIFE_FILE" ] || return 0
-    body "$LIFE_FILE" | grep -i ":$tag:" 2>/dev/null | grep -vi ":done:"
+    entries "$LIFE_FILE" | grep -i ":$tag:" 2>/dev/null | grep -vi ":done:"
 }
 
 # ---- helper: blank-line separator, but only after the first shown section --
@@ -230,7 +237,7 @@ fi   # show_waiting
 # ---- 4. Due-soon / overdue follow-ups (due:YYYY-MM-DD tokens in LIFE.TXT) ----
 # Any open line carrying due:DATE where DATE <= horizon (today + lead) is LOUD.
 if [ "$show_due" = yes ] && [ -f "$LIFE_FILE" ]; then
-    due=$(body "$LIFE_FILE" | grep -iE 'due:[0-9]{4}-[0-9]{2}-[0-9]{2}' 2>/dev/null \
+    due=$(entries "$LIFE_FILE" | grep -iE 'due:[0-9]{4}-[0-9]{2}-[0-9]{2}' 2>/dev/null \
           | grep -vi ':done:' \
           | awk -v horizon="$due_horizon" -v today="$today" -v hl="$HL" -v rst="$RST" '
             # Convert YYYY-MM-DD to an absolute day number (proleptic Gregorian).
