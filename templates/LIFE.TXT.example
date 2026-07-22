@@ -52,11 +52,11 @@ An entry is delimited by a *** line; that is the ONLY entry boundary.
   ***           = entry boundary (between entries only, never inside one)
   blank line    = paragraph break WITHIN an entry (one idea per paragraph)
   plain newline = semantic line break between sentences of one paragraph
-Semantic line breaks (one sentence per line, breaking at commas/semicolons
-  rather than randomly) follow Kernighan's advice in "UNIX for Beginners"
-  (1974): "Start each sentence on a new line. Make lines short, and break
-  lines at natural places ... rather than randomly." Keeps edits, diffs, and
-  greps landing per-sentence instead of reflowing whole paragraphs.
+Semantic line breaks: start each sentence on its own line, breaking at
+  sentence end (the period). Follows Kernighan, "UNIX for Beginners" (1974):
+  "Start each sentence on a new line." (He also suggests breaking at commas/
+  semicolons for long lines; skipped here -- one clean rule, one break per
+  sentence.) Keeps edits, diffs, and greps landing per-sentence.
 Header line (first line of an entry) carries the date + tags and stays WHOLE:
   format:  YYYY-MM-DD Day | text... :tag: :tag:   [due:YYYY-MM-DD]
   Why whole: agenda is line-based -- :todo:/:waiting:/due: must sit together
