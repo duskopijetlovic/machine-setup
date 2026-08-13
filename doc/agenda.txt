@@ -25,8 +25,16 @@ SECTIONS PRINTED
     WAITING    open  :waiting: lines from LIFE.TXT
     DUE        due:DATE items from LIFE.TXT, surfaced AGENDA_LEAD days
                early, loud once due or overdue
-    (:someday: and :dropped: never appear here -- agenda only matches
-     :todo: and :waiting:, by design)
+
+    "Open" means NOT tagged :done: or :dropped: -- both are excluded
+    from TODO/WAITING/DUE the same way, even on a line that also
+    carries :todo:/:waiting:. :someday: items never appear either,
+    since agenda only matches :todo: and :waiting: to begin with.
+
+    Reads only ENTRY HEADER lines -- lines starting YYYY-MM-DD. The
+    legend and other documentation blocks in LIFE.TXT write tags
+    literally to explain them, so they would otherwise be reported as
+    real items; the date requirement excludes them wherever they sit.
 
     Reads only ENTRY HEADER lines -- lines starting YYYY-MM-DD. The
     legend and other documentation blocks in LIFE.TXT write tags
