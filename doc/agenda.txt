@@ -21,20 +21,20 @@ SUBCOMMANDS
 
 SECTIONS PRINTED
     CALENDAR   events from calendar.txt, today .. today+CAL_DAYS
-    TODO       open  :todo:    lines from LIFE.TXT
-    WAITING    open  :waiting: lines from LIFE.TXT
+    TODO       open  :todo:    lines from LIFE.TXT, EXCLUDING any that
+               are due soon/overdue (those show in DUE instead -- see
+               below, so nothing prints twice)
+    WAITING    open  :waiting: lines from LIFE.TXT, same due-soon/
+               overdue exclusion as TODO above
     DUE        due:DATE items from LIFE.TXT, surfaced AGENDA_LEAD days
-               early, loud once due or overdue
+               early, loud once due or overdue. The ONLY place a
+               due-soon/overdue item appears -- never duplicated in
+               TODO/WAITING above, whichever tag it also carries.
 
     "Open" means NOT tagged :done: or :dropped: -- both are excluded
     from TODO/WAITING/DUE the same way, even on a line that also
     carries :todo:/:waiting:. :someday: items never appear either,
     since agenda only matches :todo: and :waiting: to begin with.
-
-    Reads only ENTRY HEADER lines -- lines starting YYYY-MM-DD. The
-    legend and other documentation blocks in LIFE.TXT write tags
-    literally to explain them, so they would otherwise be reported as
-    real items; the date requirement excludes them wherever they sit.
 
     Reads only ENTRY HEADER lines -- lines starting YYYY-MM-DD. The
     legend and other documentation blocks in LIFE.TXT write tags
@@ -105,7 +105,8 @@ GREP RECIPES
         grep 'due:2026-08-1[0-5]' ~/life/LIFE.TXT        # a date range
 
     Note: greps run straight against LIFE.TXT see the whole file, so
-    they may match the legend/doc blocks that agenda itself skips.
+    they may match the legend/doc blocks that agenda itself skips, and
+    may match due-soon/overdue items that agenda shows only in DUE.
 
 FILES
     ~/life/LIFE.TXT               journal / notes / :tag: items -- see its 
