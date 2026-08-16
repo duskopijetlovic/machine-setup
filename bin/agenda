@@ -3,11 +3,15 @@
 #
 # Surfaces, in one screen:
 #   1. Today's events + next CAL_DAYS days from calendar.txt (today highlighted)
-#   2. Open todos from LIFE.TXT      (:todo: lines lacking :done:/:dropped:)
-#   3. Open waiting-fors from LIFE.TXT (:waiting: lines lacking :done:/:dropped:)
+#   2. Open todos from LIFE.TXT      (:todo: lines lacking :done:/:dropped:,
+#      excluding any that are due soon/overdue -- those appear in DUE below,
+#      not here, so nothing prints twice)
+#   3. Open waiting-fors from LIFE.TXT (:waiting: lines lacking :done:/:dropped:,
+#      same due-soon/overdue exclusion as TODO above)
 #   4. Any LIFE.TXT line with a due:YYYY-MM-DD token that is due within the
 #      lead-time window (today + AGENDA_LEAD days) or overdue, flagged LOUD,
-#      so date-triggered follow-ups surface with time to act.
+#      so date-triggered follow-ups surface with time to act. This is the
+#      ONLY place a due-soon/overdue item appears -- see 2 and 3 above.
 #
 # Also: 'agenda tags' lists every :tag: in use in LIFE.TXT, with counts,
 # most frequent first — the file remembers the tags so you don't have to.
@@ -172,11 +176,28 @@ else
     HL=''; BOLD=''; RST=''
 fi
 
+# ---- helper: drop lines whose due:DATE qualifies for the DUE section -----
+# Keeps TODO/WAITING free of items already surfaced (louder) in DUE, so an
+# entry with a soon/overdue due: prints exactly once, in DUE, instead of
+# twice. ISO dates (YYYY-MM-DD) compare correctly as plain strings, so no
+# date arithmetic is needed here -- that's only used in the DUE section
+# itself, to compute the "Nd" shown in the marker.
+drop_due_soon() {
+    awk -v horizon="$due_horizon" '
+        { if (match($0, /due:[0-9]{4}-[0-9]{2}-[0-9]{2}/)) {
+              dstr = substr($0, RSTART+4, 10)
+              if (dstr <= horizon) next
+          }
+          print
+        }'
+}
+
 # ---- helper: pull open (not :done:/:dropped:) lines for a tag from LIFE.TXT
 open_lines() {  # $1 = tag without colons, e.g. todo
     tag=$1
     [ -f "$LIFE_FILE" ] || return 0
-    entries "$LIFE_FILE" | grep -i ":$tag:" 2>/dev/null | grep -viE ':done:|:dropped:'
+    entries "$LIFE_FILE" | grep -i ":$tag:" 2>/dev/null \
+        | grep -viE ':done:|:dropped:' | drop_due_soon
 }
 
 # ---- helper: blank-line separator, but only after the first shown section --
