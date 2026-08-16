@@ -286,10 +286,13 @@ if [ "$show_due" = yes ] && [ -f "$LIFE_FILE" ]; then
                         # when not a tty, so plain ASCII in pipes).
                         line = $0
                         sub(/due:([0-9]{4}-[0-9]{2}-[0-9]{2})/, hl "!" rst " [    DUE:" dstr " ]", line)
-                        printf "%-14s %s\n", tag, line    # left-pad marker to align text
+                        # Leading "delta\t" is a sort key only (most overdue = most
+                        # negative delta = sorts first; soonest-due sorts next after
+                        # today). Stripped by cut after the sort below.
+                        printf "%d\t%-14s %s\n", delta, tag, line
                     }
                 }
-            }')
+            }' | sort -n | cut -f2-)
     if [ -n "$due" ]; then
         sep
         echo "${BOLD}${HL}=== DUE soon / overdue (due: <= $due_horizon, lead ${AGENDA_LEAD}d) ===${RST}"
