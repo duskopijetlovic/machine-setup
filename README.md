@@ -19,7 +19,7 @@ This repository holds **machinery** - configuration, scripts, and the bootstrap
 that deploys them. It does **not** hold **personal data**.
 
 Plain-text personal data (calendar, todos, journal, waiting-fors - e.g.
-`~/life/LIFE.TXT`, `~/life/calendar.txt`) lives **outside this repo**, in
+`~/life/LIFE.TXT`, `~/life/stacks/calendar.txt`) lives **outside this repo**, in
 the sync + backup layer (Syncthing across machines, Borg/restic for backups).
 Reasons this separation is strict:
 
@@ -37,13 +37,13 @@ never under version control here.
 
 | Directory        | Holds                                                       | Deploys to                                       |
 |------------------|--------------------------------------------------------------|---------------------------------------------------|
-| `dotfiles/`      | All dotfiles, stored with a `dot.` prefix (`dot.vimrc`, `dot.exrc`, `dot.Xresources.*`, ...) | symlinked into `~/` as `.name`                     |
+| `shell/`         | Shell startup & aliases (`.bashrc`, `.profile`, etc.)       | symlinked into `~/`                                |
 | `wayland/`       | Wayland compositor configs, grouped by desktop/WM           | (parent; see below)                                |
 | `wayland/gnome/` | GNOME setup scripts (e.g. workspace keybindings)            | run on demand; not on `PATH`                       |
 | `config/`        | Files destined for XDG config (e.g. `environment.d/`)       | copied/symlinked into `~/.config/`                 |
 | `bin/`           | Utility scripts run as everyday commands (e.g. `agenda`)    | symlinked into `~/.local/bin/` (on `PATH`)         |
 | `doc/`           | Reference docs for repo tooling (e.g. `agenda` cheatsheet)  | not deployed - reference only                      |
-| `x11/`           | X11/FVWM3 bits for the FreeBSD machines                     | symlinked into `~/`                                |
+| `x11/`           | X11/FVWM3 bits for the FreeBSD machines                     | symlinked into `~/` (one exception - see note)     |
 | `templates/`     | Skeleton/example personal-data files (`*.example`)          | **copied** as seeds, only if absent (see below)    |
 | `setup/`         | Bootstrap script(s) that deploy everything above             | run manually on a new machine                      |
 
@@ -52,12 +52,12 @@ never under version control here.
 > set up together in one pass on a new machine live here together, organized by
 > directory rather than by separate repositories.
 
-**Dotfile naming convention:** files in `dotfiles/` are stored as `dot.name`
-(visible in plain `ls`, no leading-dot hiding) and deployed as `~/.name` -
-e.g. `dotfiles/dot.vimrc` -> `~/.vimrc`. Per-machine variants use a suffix:
-`dot.Xresources.desktop`, `dot.Xresources.laptop` (the bootstrap picks the
-right variant per machine). Future shell startup files (`dot.bashrc`,
-`dot.profile`, `dot.tcshrc`, ...) follow the same convention and live here too.
+> **x11/ exception:** `x11/60-keyboard-layout-multi.conf` symlinks to a
+> *system* path (`/usr/local/etc/X11/xorg.conf.d/`), not `~/`, since keyboard
+> layout config lives outside `$HOME` on FreeBSD. Same symlink mechanism as
+> the rest of `x11/` - repo stays the master copy - just a different target,
+> and it requires `sudo` to place. See the file's own header for the exact
+> command.
 
 ## Setup vs. utility scripts
 
@@ -82,7 +82,7 @@ $ ./setup/install.sh               # create symlinks / copy config into place
 
 Three deploy verbs, by kind of file:
 
-- **Symlink** - things edited in-repo (dotfiles, utility scripts) are
+- **Symlink** - things edited in-repo (shell rc files, utility scripts) are
   symlinked so the repo stays the master copy.
 - **Copy** - config that must be a real file at its destination is copied.
 - **Seed (copy-once, never overwrite)** - `templates/*.example` files are
@@ -102,7 +102,3 @@ Three deploy verbs, by kind of file:
   snapshots, so each run leaves an auditable trail of what changed.
 - Reference docs under `doc/` are not deployed - `install.sh` never touches
   them; they're browsed/`grep`ped in place, not symlinked or copied anywhere.
-- Per-host hardware/display quirks live in `doc/hosts/<hostname>.md` and are
-  **not portable** - never copy a fix from one host file to another without
-  confirming it applies (e.g. rhel1's NVIDIA notes do not apply to the
-  ThinkPads).
