@@ -12,11 +12,17 @@
 # the difference is intentional - each file follows its own lineage.
 #
 # How agenda reads this file:
-#   open todo      = a line with :todo:    and NOT :done:
-#   open waiting   = a line with :waiting: and NOT :done:
-#   closed item    = add :done: in place; it then drops out of agenda
-#   due follow-up  = add  due:YYYY-MM-DD  to a line; agenda surfaces it LOUD
-#                    within its lead window (see: agenda --help)
+#   open todo       = a line with :todo:    and NOT :done:/:dropped:
+#   open waiting    = a line with :waiting: and NOT :done:/:dropped:
+#   closed item     = add :done: in place; it then drops out of agenda
+#   dropped item    = add :dropped: in place; same effect as :done:
+#   due follow-up   = add  due:YYYY-MM-DD  to a line; shows in DUE only
+#                      (not also in TODO/WAITING) once inside its lead
+#                      window or overdue (see: agenda --help)
+#   completed date  = add  completed:YYYY-MM-DD  to a :done: line; pure
+#                      record, agenda doesn't act on it
+#   threshold date  = add  threshold:YYYY-MM-DD  to a line; agenda hides
+#                      it everywhere until that date arrives
 #
 # NOTE: This is a template. Example dates are illustrative - replace with
 # your own. Location is adjustable: agenda reads it from $LIFE_DIR
@@ -41,8 +47,19 @@ Kind:   :reference:   non-actionable lookup data (measurements, specs, etc.)
 Project:  :project_NAME:
           (grep -o ':project_[a-z0-9_]*:' LIFE.TXT | sort -u  lists all)
 Dated:  :todo: with  due:YYYY-MM-DD   (due: is a key:value token, NOT a tag --
-        no surrounding colons, always its own space-separated token)
+        no surrounding colons, always its own space-separated token, same
+        shape as completed:/threshold: below)
         (grep 'due:' LIFE.TXT  finds all; grep 'due:2026-' for a year)
+Completed:  :done: with  completed:YYYY-MM-DD   (records when an item was
+        closed. Pure data -- agenda doesn't read it, since :done: items
+        are already excluded from every section. Named "completed:", not
+        "done:", so it can't be confused with the :done: state tag.)
+        (grep 'completed:' LIFE.TXT  finds all)
+Threshold:  threshold:YYYY-MM-DD   (hides an entry from TODO/WAITING/DUE
+        entirely until that date arrives, then it behaves normally -- for
+        "don't show me this yet", not "remind me by". Works even combined
+        with due:; a future threshold suppresses the whole entry.)
+        (grep 'threshold:' LIFE.TXT  finds all)
 No contexts (@home/@errands): tasks aren't location-gated here.
 Area covers grouping; reintroduce :context_NAME: only if real
 location-batching ever appears.
@@ -62,8 +79,11 @@ Semantic line breaks: start each sentence on its own line, breaking at
   sentence.) Keeps edits, diffs, and greps landing per-sentence.
 Header line (first line of an entry) carries the date + tags and stays WHOLE:
   format:  YYYY-MM-DD Day | text... :tag: :tag:   [due:YYYY-MM-DD]
-  Why whole: agenda is line-based -- :todo:/:waiting:/due: must sit together
-  on one line, or they parse as unrelated matches. So header = one line always.
+           [threshold:YYYY-MM-DD]   [completed:YYYY-MM-DD]
+  Why whole: agenda is line-based -- :todo:/:waiting:/due:/threshold: must
+  sit together on one line, or they parse as unrelated matches. So header
+  = one line always. (completed: isn't read by agenda, but stays here too,
+  for the same grep-ability reason tags do.)
 Continuation lines (after the header, until the next ***) are free prose:
   use semantic line breaks and blank-line paragraphs as needed. agenda never
   reads these, so structure them purely for future-you.
@@ -96,4 +116,11 @@ while these continuation lines use semantic breaks.
 A blank line starts a new paragraph, one idea each.
 agenda ignores this entry entirely (:reference:),
 so it is structured purely for reading later.
+***                                   ***                                    ***
+2026-07-02 Thu | Renewed the domain in time :todo: :done: completed:2026-07-02
+***                                   ***                                    ***
+2026-07-05 Sun | Repaint the fence :todo: threshold:2026-09-01
+Not worth starting before autumn -- paint won't cure right in summer heat.
+Hidden from agenda until the threshold date; then it behaves like any
+other open :todo:.
 ***                                   ***                                    ***
