@@ -19,8 +19,9 @@
 #   due follow-up   = add  due:YYYY-MM-DD  to a line; shows in DUE only
 #                      (not also in TODO/WAITING) once inside its lead
 #                      window or overdue (see: agenda --help)
-#   completed date  = add  completed:YYYY-MM-DD  to a :done: line; pure
-#                      record, agenda doesn't act on it
+#   completed date  = add  completed:YYYY-MM-DD  to a line; excludes it
+#                      from every section on its own -- no :done: tag
+#                      required, the date itself is enough
 #   threshold date  = add  threshold:YYYY-MM-DD  to a line; agenda hides
 #                      it everywhere until that date arrives
 #
@@ -51,9 +52,10 @@ Dated:  :todo: with  due:YYYY-MM-DD   (due: is a key:value token, NOT a tag --
         shape as completed:/threshold: below)
         (grep 'due:' LIFE.TXT  finds all; grep 'due:2026-' for a year)
 Completed:  :done: with  completed:YYYY-MM-DD   (records when an item was
-        closed. Pure data -- agenda doesn't read it, since :done: items
-        are already excluded from every section. Named "completed:", not
-        "done:", so it can't be confused with the :done: state tag.)
+        closed, and excludes the line from every section on its own --
+        no :done: tag required, the date itself is enough. Named
+        "completed:", not "done:", so it can't be confused with the
+        :done: state tag.)
         (grep 'completed:' LIFE.TXT  finds all)
 Threshold:  threshold:YYYY-MM-DD   (hides an entry from TODO/WAITING/DUE
         entirely until that date arrives, then it behaves normally -- for
@@ -80,10 +82,9 @@ Semantic line breaks: start each sentence on its own line, breaking at
 Header line (first line of an entry) carries the date + tags and stays WHOLE:
   format:  YYYY-MM-DD Day | text... :tag: :tag:   [due:YYYY-MM-DD]
            [threshold:YYYY-MM-DD]   [completed:YYYY-MM-DD]
-  Why whole: agenda is line-based -- :todo:/:waiting:/due:/threshold: must
-  sit together on one line, or they parse as unrelated matches. So header
-  = one line always. (completed: isn't read by agenda, but stays here too,
-  for the same grep-ability reason tags do.)
+  Why whole: agenda is line-based -- :todo:/:waiting:/due:/threshold:/
+  completed: must sit together on one line, or they parse as unrelated
+  matches. So header = one line always.
 Continuation lines (after the header, until the next ***) are free prose:
   use semantic line breaks and blank-line paragraphs as needed. agenda never
   reads these, so structure them purely for future-you.
@@ -123,4 +124,8 @@ so it is structured purely for reading later.
 Not worth starting before autumn -- paint won't cure right in summer heat.
 Hidden from agenda until the threshold date; then it behaves like any
 other open :todo:.
+***                                   ***                                    ***
+2026-07-08 Wed | Paid the property tax :todo: completed:2026-07-08
+No :done: tag here -- completed: alone is enough to exclude this line
+from every section; the date itself is evidence the item is finished.
 ***                                   ***                                    ***

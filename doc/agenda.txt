@@ -31,17 +31,18 @@ SECTIONS PRINTED
                due-soon/overdue item appears -- never duplicated in
                TODO/WAITING above, whichever tag it also carries.
 
-    "Open" means NOT tagged :done: or :dropped: -- both are excluded
-    from TODO/WAITING/DUE the same way, even on a line that also
-    carries :todo:/:waiting:. :someday: items never appear either,
-    since agenda only matches :todo: and :waiting: to begin with.
+    "Open" means NOT tagged :done: or :dropped:, and NOT carrying a
+    completed: date -- all three are excluded from TODO/WAITING/DUE
+    the same way, even on a line that also carries :todo:/:waiting:.
+    :someday: items never appear either, since agenda only matches
+    :todo: and :waiting: to begin with.
 
     threshold:YYYY-MM-DD suppresses an entry from TODO/WAITING/DUE
     entirely until that date arrives -- even combined with a due:
     that would otherwise show it. Normal again once the date is
-    reached. completed:YYYY-MM-DD is pure data (records when a
-    :done: item was closed); agenda doesn't read it, since :done:
-    items are already excluded everywhere.
+    reached. completed:YYYY-MM-DD excludes a line from every section
+    on its own, same as :done:/:dropped: -- no :done: tag required,
+    the date itself is evidence the item is finished.
 
     Reads only ENTRY HEADER lines -- lines starting YYYY-MM-DD. The
     legend and other documentation blocks in LIFE.TXT write tags
