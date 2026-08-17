@@ -3,12 +3,13 @@
 #
 # Surfaces, in one screen:
 #   1. Today's events + next CAL_DAYS days from calendar.txt (today highlighted)
-#   2. Open todos from LIFE.TXT      (:todo: lines lacking :done:/:dropped:,
-#      excluding any that are due soon/overdue -- those appear in DUE below,
-#      not here, so nothing prints twice -- and excluding any not yet at
-#      its threshold:YYYY-MM-DD, if it has one)
-#   3. Open waiting-fors from LIFE.TXT (:waiting: lines lacking :done:/:dropped:,
-#      same due-soon/overdue and threshold: exclusions as TODO above)
+#   2. Open todos from LIFE.TXT      (:todo: lines lacking :done:/:dropped:/
+#      completed:, excluding any that are due soon/overdue -- those appear
+#      in DUE below, not here, so nothing prints twice -- and excluding any
+#      not yet at its threshold:YYYY-MM-DD, if it has one)
+#   3. Open waiting-fors from LIFE.TXT (:waiting: lines lacking :done:/
+#      :dropped:/completed:, same due-soon/overdue and threshold: exclusions
+#      as TODO above)
 #   4. Any LIFE.TXT line with a due:YYYY-MM-DD token that is due within the
 #      lead-time window (today + AGENDA_LEAD days) or overdue, flagged LOUD,
 #      so date-triggered follow-ups surface with time to act. This is the
@@ -16,9 +17,10 @@
 #      (threshold: applies here too -- suppressed until it arrives, same
 #      as 2 and 3.)
 #
-# completed:YYYY-MM-DD (records when a :done: item was closed) is pure
-# data -- agenda doesn't read it, since :done: items are already excluded
-# from every section above.
+# completed:YYYY-MM-DD (records when an item was closed) excludes a line
+# from every section on its own, same as :done:/:dropped: -- it doesn't
+# require :done: to also be present, since the date itself is evidence
+# the item is finished.
 #
 # Also: 'agenda tags' lists every :tag: in use in LIFE.TXT, with counts,
 # most frequent first — the file remembers the tags so you don't have to.
@@ -183,15 +185,24 @@ else
     HL=''; BOLD=''; RST=''
 fi
 
-# ---- helper: active entries -- excludes :done:/:dropped: and any line
-# whose threshold:DATE hasn't arrived yet (today < threshold). Centralizes
-# filtering shared by TODO/WAITING/DUE so all three treat :done:/:dropped:/
-# threshold: identically -- one place to get it right, instead of each
-# section repeating its own grep and risking one falling out of sync.
+# ---- helper: active entries -- excludes :done:/:dropped:, any line
+# carrying completed:DATE, and any line whose threshold:DATE hasn't
+# arrived yet (today < threshold). Centralizes filtering shared by
+# TODO/WAITING/DUE so all three treat these identically -- one place to
+# get it right, instead of each section repeating its own grep and
+# risking one falling out of sync.
+#
+# completed: is excluded on its own, not just alongside :done: -- an
+# entry with completed:DATE but no :done: tag (forgotten, or written in
+# either order) should still disappear; the completed: date itself is
+# the signal that the item is finished.
+#
 # A threshold: entry is fully suppressed (not shown anywhere) until its
 # date arrives, then it behaves exactly like any other entry from then on.
 active_entries() {
-    entries "$1" | grep -viE ':done:|:dropped:' | awk -v today="$today" '
+    entries "$1" | grep -viE ':done:|:dropped:' \
+        | grep -vE 'completed:[0-9]{4}-[0-9]{2}-[0-9]{2}' \
+        | awk -v today="$today" '
         { if (match($0, /threshold:[0-9]{4}-[0-9]{2}-[0-9]{2}/)) {
               tstr = substr($0, RSTART+10, 10)
               if (tstr > today) next
