@@ -19,8 +19,12 @@ This repository holds **machinery** - configuration, scripts, and the bootstrap
 that deploys them. It does **not** hold **personal data**.
 
 Plain-text personal data (calendar, todos, journal, waiting-fors - e.g.
-`~/life/LIFE.TXT`, `~/life/stacks/calendar.txt`) lives **outside this repo**, in
-the sync + backup layer (Syncthing across machines, Borg/restic for backups).
+`~/life/LIFE.TXT`, `~/life/calendar.txt`) lives **outside this repo**. Currently
+kept in sync across machines by moving a single USB flash drive between them
+(no sync app), and backed up by mirroring that drive to a second drive with a
+plain rsync one-liner (see Notes below). Deliberately minimal, not a
+not-yet-built version of something fancier - simple by choice, and the exact
+mechanism may change; whatever it is, it stays outside this repo either way.
 Reasons this separation is strict:
 
 - **Privacy** - personal data must never be pushed to a public host.
@@ -96,9 +100,14 @@ Three deploy verbs, by kind of file:
 
 - Keep secrets (tokens, keys, credentials) out of tracked files; use
   `.gitignore` so they never enter history or backups.
-- Keep personal data out of this repo entirely (see "Config, not data");
-  it lives in `~/life/` under Syncthing + backup.
+- Keep personal data out of this repo entirely (see "Config, not data"); it
+  lives on the USB flash drive, shuttled between machines by hand. Backed up
+  by mirroring to a second drive:
+  `rsync --delete -rav /mnt/usbflashdrive/ /mnt/usbflashdrive2`
+  Minimal by choice - revisit only if this stops being enough, not on
+  a schedule.
 - Reversible config scripts include a `--reset` mode and print BEFORE/AFTER
   snapshots, so each run leaves an auditable trail of what changed.
 - Reference docs under `doc/` are not deployed - `install.sh` never touches
   them; they're browsed/`grep`ped in place, not symlinked or copied anywhere.
+
