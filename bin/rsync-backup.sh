@@ -1,11 +1,11 @@
 #!/bin/sh
-# backup-usbflashdrive.sh -- mirror /mnt/usbflashdrive to /mnt/usbflashdrive2.
+# rsync-backup.sh -- mirror /mnt/usbflashdrive to /mnt/usbflashdrive2.
 # Minimal and deliberate: one rsync call, no sync/backup app layer. See
 # README.md "Config, not data" for why this exists and what it protects.
 #
 # Usage:
-#   ./backup-usbflashdrive.sh              run the mirror
-#   ./backup-usbflashdrive.sh --dry-run    show what would change, write nothing
+#   ./rsync-backup.sh              run the mirror
+#   ./rsync-backup.sh --dry-run    show what would change, write nothing
 #
 # Safety: refuses to run if either side looks unmounted (missing or empty),
 # so an unmounted drive can never masquerade as "empty" to rsync and trigger
@@ -23,12 +23,12 @@ is_nonempty_dir() {
 }
 
 if ! is_nonempty_dir "$SRC"; then
-    echo "backup-usbflashdrive: refusing to run -- $SRC missing or empty" \
+    echo "rsync-backup: refusing to run -- $SRC missing or empty" \
          "(unmounted?)" >&2
     exit 1
 fi
 if ! is_nonempty_dir "$DST"; then
-    echo "backup-usbflashdrive: refusing to run -- $DST missing or empty" \
+    echo "rsync-backup: refusing to run -- $DST missing or empty" \
          "(unmounted?)" >&2
     exit 1
 fi
@@ -41,7 +41,7 @@ if [ "$1" = "--dry-run" ]; then
 fi
 
 ts=$(date +'%Y-%m-%d %H:%M:%S')
-echo "[$ts] backup-usbflashdrive: starting ($mode)" | tee -a "$LOG"
+echo "[$ts] rsync-backup: starting ($mode)" | tee -a "$LOG"
 
 # rc must be captured via a temp file, not `$?` after the pipe -- in a
 # POSIX pipeline, `$?` reflects tee's exit status (last in the pipe), not
@@ -54,9 +54,9 @@ rm -f "$rc_file"
 
 ts=$(date +'%Y-%m-%d %H:%M:%S')
 if [ "$rc" -eq 0 ]; then
-    echo "[$ts] backup-usbflashdrive: done" | tee -a "$LOG"
+    echo "[$ts] rsync-backup: done" | tee -a "$LOG"
 else
-    echo "[$ts] backup-usbflashdrive: FAILED (rsync exit $rc)" | tee -a "$LOG"
+    echo "[$ts] rsync-backup: FAILED (rsync exit $rc)" | tee -a "$LOG"
 fi
 
 exit "$rc"
