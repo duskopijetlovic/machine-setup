@@ -102,10 +102,9 @@ Three deploy verbs, by kind of file:
   `.gitignore` so they never enter history or backups.
 - Keep personal data out of this repo entirely (see "Config, not data"); it
   lives on the USB flash drive, shuttled between machines by hand. Backed up
-  by mirroring to a second drive:
-  `rsync --delete -rav /mnt/usbflashdrive/ /mnt/usbflashdrive2`
-  Minimal by choice - revisit only if this stops being enough, not on
-  a schedule.
+  by `bin/backup-usbflashdrive.sh` (dry-run and log support, same convention
+  as `bin/backup-repos.sh`), which mirrors it to a second drive. Minimal by
+  choice - revisit only if this stops being enough, not on a schedule.
 - Reversible config scripts include a `--reset` mode and print BEFORE/AFTER
   snapshots, so each run leaves an auditable trail of what changed.
 - Reference docs under `doc/` are not deployed - `install.sh` never touches
