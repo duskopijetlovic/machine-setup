@@ -76,7 +76,7 @@ Two categories of script live here, with different homes and habits:
 
 ## Deploying to a new machine
 
-- Known gap: `setup/install.sh` (referenced above) doesn't exist yet — see
+- Known gap: `setup/install.sh` (referenced above) doesn't exist yet -- see
   `TODO.md`.
 
 ```
