@@ -41,12 +41,16 @@ $ sudo dnf install \
   firefox \
   chromium \
   lynx \
+  graphviz \
+  graphviz-doc \
   google-carlito-fonts
   # xorg-x11-fonts-misc: traditional X bitmap fonts (fixed 6x13 etc.) - the
   # classic xterm look; weak dep of xterm, listed explicitly so it's guaranteed
   # xrdb: loads ~/.Xresources (xterm colors/fonts/keybindings); XWayland apps
   # read it. Run after login or config change:  xrdb ~/.Xresources
   # lynx: text-based web browser (base repo, exact match: `dnf search lynx`)
+  # graphviz-doc: verify this is in AppStream/base and not EPEL-only on
+  # RHEL 10 before relying on it (dnf search graphviz-doc / dnf provides)
   # google-carlito-fonts: Calibri metric-compatible sans-serif. Install this
   # so LibreOffice renders Calibri .docx files with correct metrics/layout.
   # (The orange "font substituted" warning in Writer stays - LibreOffice
@@ -97,6 +101,25 @@ $ sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.as
 $ sudo dnf install brave-browser
 ```
 
+### LaTeX (LuaLaTeX engine) + latexmk — NOT YET INSTALLED on RHEL 10
+Present on the FreeBSD 14 (X11/FVWM) machines already (installed a few years
+ago via pkg — see FreeBSD section). Not yet set up on either RHEL 10 box;
+tracked in TODO.md.
+
+RHEL 10 ships TeX Live natively, split into many sub-packages (Fedora-style),
+not a single `texlive` blob. Starting point — VERIFY exact package names with
+`dnf search texlive-` before running:
+```
+$ sudo dnf install \
+  texlive-scheme-basic \
+  texlive-luatex \
+  texlive-latexmk \
+  latexmk
+```
+`texlive-scheme-basic` gets the minimal working engine set; add specific
+`texlive-<package>` sub-packages as documents demand them rather than
+reaching for `texlive-scheme-full` up front.
+
 ### From EPEL (requires EPEL+CRB enabled, above)
 ```
 $ sudo dnf install \
@@ -146,12 +169,21 @@ $ sudo pkg install \
   firefox \
   chromium \
   lynx \
-  crosextrafonts-carlito
+  crosextrafonts-carlito \
+  graphviz \
+  texlive-base
   # lynx: text-based web browser. Plain `lynx` is the pkg you want -
   # `pkg search lynx` also lists ja-lynx (multi-byte build) and lynx-current
   # (development); don't grab those by mistake.
   # crosextrafonts-carlito: Calibri metric-compatible font (RHEL calls it
   # google-carlito-fonts). Same purpose - faithful Calibri .docx rendering.
+  # graphviz: same name on both platforms.
+  # texlive-base: meta-port; on the FreeBSD 14 laptop this pulls in
+  # tex-luatex, tex-formats, tex-basic-engines, tex-kpathsea, etc., and is
+  # what actually provides /usr/local/bin/latexmk (confirmed via
+  # `pkg which /usr/local/bin/latexmk` -> texlive-base-20250308_2).
+  # Already installed on FreeBSD 14 boxes (done a few years ago); NOT YET
+  # installed on RHEL 10 — see RHEL LaTeX subsection above and TODO.md.
   # ... add the rest
 ```
 
@@ -195,4 +227,6 @@ Notes on FreeBSD name differences vs RHEL:
 | Browser (Brave)      | brave-browser (3rd-party repo) | linux-brave (Linux emu) | RHEL: add Brave repo+key first, native pkg. FreeBSD: Linux binary, needs Linux compat layer |
 | Browser (text)       | lynx                   | lynx             | same name; FreeBSD also has ja-lynx / lynx-current variants - use plain `lynx` |
 | Calibri-compat font  | google-carlito-fonts   | crosextrafonts-carlito | different names; same Carlito font for faithful Calibri .docx rendering |
+| Graphviz             | graphviz, graphviz-doc | graphviz         | verify graphviz-doc is AppStream/base and not EPEL-only on RHEL 10 |
+| LaTeX (LuaLaTeX)     | texlive-scheme-basic, texlive-luatex, texlive-latexmk, latexmk (verify names) | texlive-base (pulls in tex-luatex, tex-formats, latexmk) | NOT YET installed on RHEL 10; see RHEL LaTeX subsection + TODO.md |
 | (add rows as you go) |                        |                  |                                |

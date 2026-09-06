@@ -5,3 +5,5 @@
       including --dry-run support. Either write install.sh to match the
       README, or update the README/layout table if the bootstrap approach
       has changed.
+- [ ] Install graphviz, graphviz-doc, and LaTeX (LuaLaTeX + latexmk) on both
+      RHEL 10 machines
