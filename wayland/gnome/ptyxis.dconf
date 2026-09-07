@@ -1,0 +1,25 @@
+[/]
+cursor-shape='block'
+default-profile-uuid='fb95dd0f99664f3dfce2c5736a24e49f'
+font-name='Monospace 12'
+interface-style='system'
+profile-uuids=['fb95dd0f99664f3dfce2c5736a24e49f', '5568a57c049fc23eadfa0b246a9ce241', '9b7fa5f4f5d5251605f42d2d6a9ddfdd']
+restore-window-size=false
+use-system-font=false
+window-size=(uint32 80, uint32 35)
+
+[Profiles/5568a57c049fc23eadfa0b246a9ce241]
+label='TestMyTheme'
+palette='paper'
+
+[Profiles/9b7fa5f4f5d5251605f42d2d6a9ddfdd]
+label='ForCmp'
+palette='Aci'
+
+[Profiles/fb95dd0f99664f3dfce2c5736a24e49f]
+bold-is-bright=true
+label='Profile_80_Columns'
+opacity=1.0
+palette='mytheme'
+scrollback-lines=10000
+use-custom-command=false
