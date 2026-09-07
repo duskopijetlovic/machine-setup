@@ -1,0 +1,492 @@
+# RHEL 10 / GNOME-Wayland -- Minimal Customization Runbook
+# Target: ~15 minutes on a fresh or existing RHEL 10.x install
+# Shell: bash | Terminal: Ptyxis (GNOME Terminal 47.x) | DE: GNOME-Wayland
+
+# Follow sections in order. Each section is independent -- skip any
+# that do not apply. All commands are copy-paste ready.
+# ASCII only. No Unicode.
+
+# ============================================================
+#   PART A -- INITIAL SETUP ON A SINGLE MACHINE
+# ============================================================
+
+# ------------------------------------------------------------
+#   STEP 0 -- BACKUP EXISTING CONFIG (run before anything else)
+# ------------------------------------------------------------
+
+# 0a. Backup all Ptyxis/GNOME Terminal settings:
+dconf dump /org/gnome/Ptyxis/ > ~/ptyxis-backup-$(date +%Y%m%d).dconf
+
+# 0b. Backup any existing dotfiles that will be touched:
+for f in ~/.bashrc ~/.bash_profile ~/.profile; do
+    [ -f "$f" ] && cp "$f" "${f}.bak-$(date +%Y%m%d)"
+done
+
+# 0c. Backup existing environment.d config (if any):
+[ -d ~/.config/environment.d ] && \
+    cp -r ~/.config/environment.d \
+          ~/.config/environment.d.bak-$(date +%Y%m%d)
+
+# 0d. Verify backups were created:
+ls -lh ~/ptyxis-backup-*.dconf
+ls -lh ~/.bashrc.bak-* ~/.bash_profile.bak-* 2>/dev/null
+ls -lh ~/.config/environment.d.bak-* 2>/dev/null
+
+# To restore Ptyxis settings from backup if needed:
+#   dconf load /org/gnome/Ptyxis/ < ~/ptyxis-backup-YYYYMMDD.dconf
+
+# ------------------------------------------------------------
+#   STEP 1 -- SESSION-WIDE ENVIRONMENT VARIABLES
+# ------------------------------------------------------------
+
+# These are visible to ALL apps in the GNOME session,
+# not just Ptyxis. This is the correct place for env vars
+# on GNOME-Wayland (replaces ~/.xsessionrc / ~/.xprofile).
+
+mkdir -p ~/.config/environment.d
+
+cat > ~/.config/environment.d/myenv.conf << 'EOF'
+EDITOR=vi
+VISUAL=vi
+MANWIDTH=80
+EOF
+
+# Verify:
+cat ~/.config/environment.d/myenv.conf
+
+# Apply
+
+# Option A (simplest) -- log out and log back in.
+# systemd reads ~/.config/environment.d/myenv.conf automatically at next login.
+
+# Option B -- apply immediately without re-login:
+export EDITOR=vi
+export VISUAL=vi
+export MANWIDTH=80
+systemctl --user import-environment EDITOR VISUAL MANWIDTH
+
+# Verify:
+systemctl --user show-environment | grep -E 'EDITOR|VISUAL|MANWIDTH'
+
+# ------------------------------------------------------------
+#   STEP 2 -- BASH CONFIGURATION
+# ------------------------------------------------------------
+
+# 2a. ~/.bashrc -- interactive non-login shells (Ptyxis windows/tabs)
+#
+# Check if ~/.bashrc exists and review it first:
+[ -f ~/.bashrc ] && cat ~/.bashrc
+
+# Append customizations (does not overwrite existing content):
+cat >> ~/.bashrc << 'EOF'
+
+# --- Personal customizations ---
+
+# Minimal prompt: $ for regular user
+PS1='$ '
+
+# vi-style command line editing
+set -o vi
+
+# Useful aliases
+alias ll='ls -lh'
+alias la='ls -lah'
+alias ..='cd ..'
+
+# Confirm environment vars are set (belt-and-suspenders for Ptyxis):
+export EDITOR=vi
+export VISUAL=vi
+export MANWIDTH=80
+EOF
+
+# set -o vi usage notes:
+#   - Prompt starts in INSERT mode -- typing works as normal
+#   - Press Esc to enter NORMAL (command) mode
+#   - In normal mode: h/l move left/right, b/w jump words,
+#     k/j navigate history, / searches history
+#   - Press i or a to return to INSERT mode
+
+# 2b. ~/.bash_profile -- login shells (Virtual Console, SSH)
+#
+# Ensure ~/.bashrc is sourced from login shells too:
+grep -q 'bashrc' ~/.bash_profile 2>/dev/null || \
+    printf '\n# Source ~/.bashrc for login shells (VC, SSH)\n[[ -f ~/.bashrc ]] && source ~/.bashrc\n' \
+    >> ~/.bash_profile
+
+# Step 2b note:
+# The grep checks if the existing ~/.bash_profile already sources ~/.bashrc.
+# If it does, then Step 2b does nothing.
+
+# Apply to current session without re-login:
+source ~/.bashrc
+
+# ------------------------------------------------------------
+#   STEP 3 -- PTYXIS COLOR THEME (.palette file)
+# ------------------------------------------------------------
+
+# Ptyxis picks up .palette files from this directory on next launch:
+mkdir -p ~/.local/share/org.gnome.Ptyxis/palettes/
+
+# Example: a clean dark theme with readable contrast.
+# Edit Color0..Color15 to your preference.
+# Both [Light] and [Dark] sections -> auto-switches with GNOME theme.
+# IMPORTANT: both [Light] and [Dark] sections MUST be present.
+# A file with only one section will be silently ignored by Ptyxis 47.x.
+
+cat > ~/.local/share/org.gnome.Ptyxis/palettes/mytheme.palette << 'EOF'
+[Palette]
+Name=MyTheme
+Primary=false
+
+[Light]
+Foreground=#1d1d20
+Background=#ffffff
+Cursor=#1d1d20
+Color0=#1d1d20
+Color1=#c01c28
+Color2=#26a269
+Color3=#a2734c
+Color4=#12488b
+Color5=#a347ba
+Color6=#2aa1b3
+Color7=#cfcfcf
+Color8=#5d5d5d
+Color9=#f66151
+Color10=#33d17a
+Color11=#e9ad0c
+Color12=#2a7bde
+Color13=#c061cb
+Color14=#33c7de
+Color15=#ffffff
+
+[Dark]
+Foreground=#ffffff
+Background=#1c1c1f
+Cursor=#ffffff
+Color0=#241f31
+Color1=#c01c28
+Color2=#2ec27e
+Color3=#f5c211
+Color4=#1e78e4
+Color5=#9841bb
+Color6=#0ab9dc
+Color7=#c0bfbc
+Color8=#5e5c64
+Color9=#ed333b
+Color10=#57e389
+Color11=#f8e45c
+Color12=#51a1ff
+Color13=#c061cb
+Color14=#4fd2fd
+Color15=#f6f5f4
+EOF
+
+# After creating the palette file, restart Ptyxis fully:
+#   Alt+F2 -> type: ptyxis -> Enter
+# Then select the palette in Preferences -> Profile -> Color -> Palette.
+#
+# To set it via dconf (use the FILENAME STEM, not the Name= value):
+#   The palette ID is always the filename without .palette, case-sensitive.
+#   mytheme.palette -> ID is 'mytheme'  (not 'MyTheme')
+#   classic.palette -> ID is 'classic'  (not 'Classic')
+#
+UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+dconf write /org/gnome/Ptyxis/Profiles/$UUID/palette "'mytheme'"
+
+# Verify:
+dconf read /org/gnome/Ptyxis/Profiles/$UUID/palette
+# Expected output: 'mytheme'
+
+# Then restart Ptyxis: Alt+F2 -> ptyxis -> Enter
+#
+# IMPORTANT: do NOT use gsettings set for palette -- use dconf write.
+# gsettings set requires the schema to be registered, which is not
+# guaranteed on RHEL 10. dconf write always works.
+#
+# IMPORTANT: do NOT run pkill ptyxis from inside a Ptyxis window.
+# It kills the shell running the command before the relaunch can execute.
+# Always restart via Alt+F2 or from a TTY (Ctrl+Alt+F3).
+#
+# NOTE: built-in palettes (Panda, tango, nord, etc.) switch instantly
+# in the GUI with no restart. Custom .palette files require a full restart
+# because Ptyxis only reads them from disk at startup.
+#
+# NOTE: Ptyxis 47.13 on RHEL 10 has a known issue where custom palette
+# colors may not render in the terminal content even when correctly set.
+# Your .palette files and dconf state are correct if:
+#   - The palette appears in Preferences -> Color -> Palette dropdown
+#   - dconf read confirms the palette key is stored
+# The rendering issue is a Ptyxis 47.x bug. It will likely resolve
+# automatically when RHEL ships a newer Ptyxis version.
+#
+# In the meantime, use a built-in palette from the GUI palette picker
+# (Preferences -> Appearance -> Show All Palettes). Over 200 built-in
+# palettes are available, including: xterm, rxvt, linux, tango, nord,
+# Solarized, Mono Green, Mono Amber, C64, Panda, dracula, and more.
+
+# ------------------------------------------------------------
+#   STEP 4 -- PTYXIS PROFILE TWEAKS (optional)
+# ------------------------------------------------------------
+
+UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+
+# Font -- top-level key, not per-profile:
+dconf write /org/gnome/Ptyxis/font-name "'Monospace 12'"
+
+# Use custom font instead of system font -- top-level:
+dconf write /org/gnome/Ptyxis/use-system-font false
+
+# Cursor shape -- top-level key, not per-profile:
+# Valid values: 'block', 'ibeam', 'underline'
+dconf write /org/gnome/Ptyxis/cursor-shape "'block'"
+
+# Per-profile keys:
+dconf write /org/gnome/Ptyxis/Profiles/$UUID/opacity 1.0
+dconf write /org/gnome/Ptyxis/Profiles/$UUID/bold-is-bright true
+dconf write /org/gnome/Ptyxis/Profiles/$UUID/scrollback-lines 10000
+
+# Verify top-level settings:
+dconf dump /org/gnome/Ptyxis/
+
+# Verify profile settings:
+dconf dump /org/gnome/Ptyxis/Profiles/$UUID/
+
+# ------------------------------------------------------------
+#   STEP 5 -- VERIFY EVERYTHING
+# ------------------------------------------------------------
+
+# 5a. Check session environment:
+systemctl --user show-environment | grep -E 'EDITOR|VISUAL|MANWIDTH'
+
+# 5b. Check active shell:
+echo $SHELL
+ps $$
+
+# 5c. Check display server:
+echo $XDG_SESSION_TYPE          # should print: wayland
+
+# 5d. Check prompt (should be just $):
+echo "PS1 is: $PS1"
+
+# 5e. Verify vi-mode is active:
+set -o | grep -w vi                # should show: vi   on
+
+# 5f. Check palette file is in place:
+ls -lh ~/.local/share/org.gnome.Ptyxis/palettes/
+
+# 5g. Check Ptyxis dconf settings:
+dconf dump /org/gnome/Ptyxis/
+
+# ------------------------------------------------------------
+#   ROLLBACK -- if anything goes wrong
+# ------------------------------------------------------------
+
+# Restore Ptyxis settings:
+#   dconf load /org/gnome/Ptyxis/ < ~/ptyxis-backup-YYYYMMDD.dconf
+
+# Restore dotfiles:
+#   cp ~/.bashrc.bak-YYYYMMDD ~/.bashrc
+#   cp ~/.bash_profile.bak-YYYYMMDD ~/.bash_profile
+
+# Restore environment.d:
+#    rm -rf ~/.config/environment.d
+#    cp -r ~/.config/environment.d.bak-YYYYMMDD ~/.config/environment.d
+
+# Remove palette file:
+#    rm ~/.local/share/org.gnome.Ptyxis/palettes/mytheme.palette
+
+# Reset all Ptyxis settings to factory defaults (destructive):
+#   dconf reset -f /org/gnome/Ptyxis/
+
+# ============================================================
+#   PART B -- MIGRATING TO A NEW MACHINE OR FRESH OS INSTALL
+# ============================================================
+#
+# Use this section to mirror your ThinkPad setup onto a Dell desktop
+# (or any other machine) running a fresh RHEL 10 / GNOME-Wayland install.
+# Run steps B0-B6 in order.
+
+# ------------------------------------------------------------
+#   STEP B0 -- VERIFY PTYXIS IS INSTALLED ON THE TARGET
+# ------------------------------------------------------------
+
+# Run this on the TARGET machine (the new Dell):
+rpm -q ptyxis
+# Expected: ptyxis-47.x-1.el10 (or newer)
+
+# If not installed:
+#   sudo dnf install ptyxis
+
+# ------------------------------------------------------------
+#   STEP B1 -- COLLECT EVERYTHING ON THE SOURCE (ThinkPad)
+# ------------------------------------------------------------
+
+# Run these on the SOURCE machine (the ThinkPad):
+
+mkdir -p ~/migrate-rhel10
+
+# Bash config:
+cp ~/.bashrc          ~/migrate-rhel10/
+cp ~/.bash_profile    ~/migrate-rhel10/
+
+# Session environment variables:
+cp -r ~/.config/environment.d/ ~/migrate-rhel10/
+
+# Ptyxis dconf state (refresh the backup first):
+dconf dump /org/gnome/Ptyxis/ > ~/migrate-rhel10/ptyxis.dconf
+
+# Custom palette files:
+cp -r ~/.local/share/org.gnome.Ptyxis/palettes/ ~/migrate-rhel10/
+
+# Verify everything is collected:
+find ~/migrate-rhel10 -type f | sort
+
+# Expected output (example):
+#   /home/you/migrate-rhel10/.bashrc
+#   /home/you/migrate-rhel10/.bash_profile
+#   /home/you/migrate-rhel10/environment.d/myenv.conf
+#   /home/you/migrate-rhel10/ptyxis.dconf
+#   /home/you/migrate-rhel10/palettes/classic.palette
+#   /home/you/migrate-rhel10/palettes/mytheme.palette
+#   /home/you/migrate-rhel10/palettes/paper.palette
+
+# ------------------------------------------------------------
+#   STEP B2 -- TRANSFER TO THE TARGET
+# ------------------------------------------------------------
+
+# Option A -- scp (run from the SOURCE / ThinkPad):
+scp -r ~/migrate-rhel10/ you@dell-hostname:~/
+
+# Option B -- rsync (run from the SOURCE / ThinkPad):
+rsync -av ~/migrate-rhel10/ you@dell-hostname:~/migrate-rhel10/
+
+# Option C -- USB drive or cloud storage (copy manually)
+
+# ------------------------------------------------------------
+#   STEP B3 -- APPLY ON THE TARGET (Dell)
+# ------------------------------------------------------------
+
+# Run these on the TARGET machine (the new Dell):
+
+# Bash config:
+cp ~/migrate-rhel10/.bashrc       ~/.bashrc
+cp ~/migrate-rhel10/.bash_profile ~/.bash_profile
+
+# Session environment variables:
+mkdir -p ~/.config/environment.d/
+cp ~/migrate-rhel10/environment.d/* ~/.config/environment.d/
+
+# Custom palette files -- MUST be copied before dconf load and before
+# Ptyxis starts, so Ptyxis finds them on its first launch:
+mkdir -p ~/.local/share/org.gnome.Ptyxis/palettes/
+cp ~/migrate-rhel10/palettes/*.palette \
+   ~/.local/share/org.gnome.Ptyxis/palettes/
+
+# Ptyxis dconf state -- loads all profiles, palette selection, and settings:
+dconf load /org/gnome/Ptyxis/ < ~/migrate-rhel10/ptyxis.dconf
+
+# Verify dconf loaded correctly:
+dconf dump /org/gnome/Ptyxis/
+
+# Reload bash config in current shell:
+source ~/.bashrc
+
+# ------------------------------------------------------------
+#   STEP B4 -- RESTART PTYXIS ON THE TARGET
+# ------------------------------------------------------------
+
+# Custom palette files are only read at Ptyxis startup.
+# A full restart is required for them to be discovered.
+#
+# CORRECT restart method -- use GNOME Run Dialog:
+#   Alt+F2 -> type: ptyxis -> Enter
+#
+# Or from a TTY:
+#   Ctrl+Alt+F3
+#   pkill -f ptyxis
+#   Ctrl+Alt+F2  (return to GNOME session)
+#   Then press Super and launch Ptyxis normally
+#
+# WRONG -- do NOT run this from inside a Ptyxis window:
+#   pkill -f ptyxis && ptyxis &
+# This kills the shell running the command before ptyxis can relaunch.
+
+# ------------------------------------------------------------
+#   STEP B5 -- VERIFY ON THE TARGET
+# ------------------------------------------------------------
+
+# Run these in the new Ptyxis window on the TARGET:
+
+echo "--- bash ---"
+head -5 ~/.bashrc
+
+echo "--- environment.d ---"
+ls ~/.config/environment.d/
+cat ~/.config/environment.d/myenv.conf
+
+echo "--- palettes ---"
+ls ~/.local/share/org.gnome.Ptyxis/palettes/
+
+echo "--- ptyxis dconf ---"
+dconf dump /org/gnome/Ptyxis/
+
+echo "--- session ---"
+echo $XDG_SESSION_TYPE           # should print: wayland
+echo $SHELL                      # should print: /bin/bash
+set -o | grep -w vi              # should show:  vi   on
+
+# Log out and back in to activate environment.d variables for GUI apps:
+#   (they are already active inside Ptyxis via ~/.bashrc)
+# After re-login, verify:
+systemctl --user show-environment | grep -E 'EDITOR|VISUAL|MANWIDTH'
+
+# ------------------------------------------------------------
+#   STEP B6 -- SET PALETTE ON THE TARGET
+# ------------------------------------------------------------
+
+# Get the default profile UUID on the TARGET:
+UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+
+# Verify which palette is currently set:
+dconf read /org/gnome/Ptyxis/Profiles/$UUID/palette
+
+# Switch palette using the FILENAME STEM (not the Name= value):
+#   mytheme.palette -> use 'mytheme'  (not 'MyTheme')
+#   classic.palette -> use 'classic'  (not 'Classic')
+#   paper.palette   -> use 'paper'    (not 'Paper')
+
+dconf write /org/gnome/Ptyxis/Profiles/$UUID/palette "'mytheme'"
+
+# Verify:
+dconf read /org/gnome/Ptyxis/Profiles/$UUID/palette
+
+# Restart Ptyxis again: Alt+F2 -> ptyxis -> Enter
+
+# ------------------------------------------------------------
+#   PART B NOTES
+# ------------------------------------------------------------
+
+# NOTE 1: Profile UUIDs carry over as-is from the source machine.
+# This is harmless -- Ptyxis uses whatever UUIDs are in dconf.
+
+# NOTE 2: environment.d variables (EDITOR, VISUAL, MANWIDTH) are
+# active inside Ptyxis via ~/.bashrc immediately after 'source ~/.bashrc'.
+# For GUI apps launched from GNOME Shell (Activities menu, .desktop files),
+# a logout/login is required.
+
+# NOTE 3: dconf load is additive -- it merges with existing dconf keys.
+# To do a clean wipe before loading (start from scratch):
+#   dconf reset -f /org/gnome/Ptyxis/
+#   dconf load /org/gnome/Ptyxis/ < ~/migrate-rhel10/ptyxis.dconf
+
+# NOTE 4: Ptyxis 47.13 on RHEL 10 has a known issue where custom palette
+# colors may not render in the terminal content even when correctly set.
+# Your palette files and dconf state are correct as long as:
+#   - Palette appears in Preferences -> Color -> Palette dropdown
+#   - dconf read confirms the palette key is stored correctly
+# The rendering issue will likely resolve when RHEL ships a newer Ptyxis.
+# In the meantime, use built-in palettes from the GUI palette picker.
+
+# NOTE 5: Both [Light] and [Dark] sections must be present in every
+# .palette file. A file with only one section is silently ignored by
+# Ptyxis 47.x and will not appear in the GUI palette dropdown.
