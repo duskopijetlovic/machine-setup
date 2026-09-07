@@ -1,3 +1,11 @@
+# Ptyxis (GNOME Terminal 47.x) dconf state -- profiles, palette, and settings.
+# Deploy: dconf load /org/gnome/Ptyxis/ < ptyxis.dconf
+# Refresh: dconf dump /org/gnome/Ptyxis/ > wayland/gnome/ptyxis.dconf
+# Note: dconf load is additive. For a clean slate first:
+#   dconf reset -f /org/gnome/Ptyxis/ && dconf load /org/gnome/Ptyxis/ < ptyxis.dconf
+# Custom .palette files must be in place BEFORE loading and BEFORE Ptyxis starts.
+# See doc/rhel10-gnome-wayland-setup-runbook.txt (Steps B3-B4) for full migration steps.
+
 [/]
 cursor-shape='block'
 default-profile-uuid='fb95dd0f99664f3dfce2c5736a24e49f'
