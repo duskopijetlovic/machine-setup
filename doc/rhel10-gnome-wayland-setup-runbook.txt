@@ -59,6 +59,12 @@ ls -lh ~/.config/environment.d.bak-* 2>/dev/null
 #     Read by systemd-environment-d-generator(8) at login. Per-user, well
 #     specified, applies to all GUI apps and systemd user units without
 #     involving a shell. The correct modern approach on GNOME-Wayland.
+#
+# Not related: ~/.Xresources
+#     Sets X client properties (fonts, colors, keybindings) via xrdb --
+#     a different concern entirely from session environment variables.
+#     Still relevant on RHEL 10 for XWayland apps (xterm, etc.); loaded
+#     with:  xrdb ~/.Xresources
 
 mkdir -p ~/.config/environment.d
 
