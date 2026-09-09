@@ -46,3 +46,12 @@ alias rsyncv='rsync -avz --progress --itemize-changes'
 export EDITOR=vi
 export VISUAL=vi
 export MANWIDTH=80
+
+# History
+# NOTE: bash 4.3+ accepts -1 for truly unlimited. However, since this dotfile
+# may also be deployed on legacy systems (RHEL 5 = bash 3.2, RHEL 6 = bash
+# 4.1.2), a large explicit value is used for broadest compatibility.
+HISTSIZE=1000000
+HISTFILESIZE=1000000
+HISTCONTROL=ignoredups    # skip consecutive duplicate commands
+HISTTIMEFORMAT='%F %T  '  # timestamp each entry: 2026-09-09  14:23:01
