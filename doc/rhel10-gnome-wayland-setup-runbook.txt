@@ -42,6 +42,23 @@ ls -lh ~/.config/environment.d.bak-* 2>/dev/null
 # These are visible to ALL apps in the GNOME session,
 # not just Ptyxis. This is the correct place for env vars
 # on GNOME-Wayland (replaces ~/.xsessionrc / ~/.xprofile).
+#
+# Historical context -- pre-systemd (SysV init era) approaches and why
+# they are NOT used here:
+#
+#   ~/.xsessionrc / ~/.xprofile
+#     Sourced by the display manager (GDM, LightDM, etc.) before launching
+#     the desktop session. Not standardised: different display managers read
+#     different files; behaviour varies across distributions. Fragile.
+#
+#   /etc/environment
+#     Read by PAM (pam_env) at login; no shell involved. Still works on RHEL,
+#     but is system-wide -- affects all users on the machine, not per-user.
+#
+#   ~/.config/environment.d/*.conf  (this step)
+#     Read by systemd-environment-d-generator(8) at login. Per-user, well
+#     specified, applies to all GUI apps and systemd user units without
+#     involving a shell. The correct modern approach on GNOME-Wayland.
 
 mkdir -p ~/.config/environment.d
 
@@ -64,6 +81,15 @@ export EDITOR=vi
 export VISUAL=vi
 export MANWIDTH=80
 systemctl --user import-environment EDITOR VISUAL MANWIDTH
+
+# To remove a variable from the running session (reverse of import-environment):
+#   systemctl --user unset-environment VARIABLE
+#   systemctl --user unset-environment EDITOR VISUAL MANWIDTH  # multiple at once
+#
+# Note: import-environment and source work in opposite directions.
+#   source ~/.bashrc        -- pulls config INTO the current shell from a file
+#   import-environment      -- pushes variables FROM the current shell UP into
+#                              the systemd user session (GUI apps, user units)
 
 # Verify:
 systemctl --user show-environment | grep -E 'EDITOR|VISUAL|MANWIDTH'
