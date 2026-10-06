@@ -2,7 +2,10 @@
 # agenda — one unified daily view over your plain-text life.
 #
 # Surfaces, in one screen:
-#   1. Today's events + next CAL_DAYS days from calendar.txt (today highlighted)
+#   1. Today's events + next CAL_DAYS days from calendar.txt (today highlighted).
+#      Same-day events are ordered by start time when the entry carries an
+#      @ time token (@10am, @1pm-3pm, @11-11:15am, @13:30); untimed entries
+#      come first. See sort_cal() for the parsing rules.
 #   2. Open todos from LIFE.TXT      (:todo: lines lacking :done:/:dropped:/
 #      completed:, excluding any that are due soon/overdue -- those appear
 #      in DUE below, not here, so nothing prints twice -- and excluding any
@@ -87,6 +90,10 @@ Options:
 
 Paths come from \$LIFE_DIR (default ~/life). Options override env vars,
 which override the built-in defaults.
+
+Calendar times: put an @ token on a calendar.txt line to have same-day events
+sorted by start time, e.g. @10am  @1pm-3pm  @11-11:15am  @13:30. Untimed
+entries list first.
 
 Examples:
   agenda                       # daily glance, all sections
@@ -239,6 +246,65 @@ open_lines() {  # $1 = tag without colons, e.g. todo
 _printed=no
 sep() { [ "$_printed" = yes ] && echo; _printed=yes; }
 
+# ---- helper: sort calendar lines by date, then by start time -------------
+# A plain sort orders by date but then by the text after it, so same-day
+# events come out alphabetically. To order them by time instead, each line
+# gets a sort key prepended (decorate), the stream is sorted, and the key
+# is cut off again (undecorate).
+#
+# Time comes from an @ token anywhere on the line:  @H[:MM][am|pm][-H[:MM][am|pm]]
+#   @10am   @1pm-3pm   @11-11:15am   @11-12:15pm   @13:30   @9:30am-10
+# The @ must be preceded by whitespace (or start the line) and followed by a
+# digit, so email addresses (name@host) are never mistaken for times.
+# Only the START time is used for ordering.
+#   - A start with no am/pm borrows the end's (11-11:15am = 11am), unless that
+#     puts the start after the end (11-12:15pm = 11am, not 11pm).
+#   - No am/pm anywhere is read as 24-hour time (@13:30 = 1:30pm).
+# Lines with no @ token (all-day / untimed) sort BEFORE timed ones that day.
+# Ties fall back to the line text, so output is deterministic.
+sort_cal() {
+    awk '
+        # Split one clock string (H, H:MM, any of them with am/pm) into the
+        # globals CH, CM, CMER (CMER is "am", "pm" or "" when not given).
+        function parse_clock(s,   i) {
+            CMER = ""
+            if (s ~ /am$/)      { CMER = "am"; sub(/am$/, "", s) }
+            else if (s ~ /pm$/) { CMER = "pm"; sub(/pm$/, "", s) }
+            i = index(s, ":")
+            if (i) { CH = substr(s, 1, i - 1) + 0; CM = substr(s, i + 1) + 0 }
+            else   { CH = s + 0; CM = 0 }
+        }
+        # Minutes since midnight for hour h, minute m, meridiem mer.
+        function mins(h, m, mer) {
+            if (mer == "am")      { if (h == 12) h = 0 }
+            else if (mer == "pm") { if (h < 12)  h += 12 }
+            return h * 60 + m
+        }
+        {
+            key = 0                                # untimed sorts first
+            # Two simple matches instead of one big regex: find "@<digit>"
+            # after whitespace, then take the run of time characters after it.
+            if (match($0, /(^|[ \t])@[0-9]/)) {
+                rest = tolower(substr($0, RSTART + RLENGTH - 1))
+                match(rest, /^[0-9:apm-]+/)
+                tok = substr(rest, 1, RLENGTH)
+                sub(/-$/, "", tok)
+                n = split(tok, part, "-")
+                parse_clock(part[1]); sh = CH; sm = CM; smer = CMER
+                if (n > 1) { parse_clock(part[2]); eh = CH; em = CM; emer = CMER }
+                else       { eh = -1; em = 0; emer = "" }
+                if (smer == "" && emer != "") {
+                    start = mins(sh, sm, emer)
+                    if (start > mins(eh, em, emer)) start -= 720
+                } else {
+                    start = mins(sh, sm, smer)
+                }
+                key = start + 1                    # +1 keeps 12am above untimed
+            }
+            printf "%s %05d\t%s\n", substr($0, 1, 10), key, $0
+        }' | sort | cut -f2-
+}
+
 # ---- 1. Calendar: today highlighted, next CAL_DAYS days listed ----------
 if [ "$show_cal" = yes ]; then
 sep
@@ -250,11 +316,11 @@ if [ -f "$CAL_FILE" ]; then
         || cutoff=$(date -v+"${CAL_DAYS}"d +%F 2>/dev/null) \
         || cutoff="9999-12-31"                    # if both fail, show all upcoming
 
-    # Strip comments/blanks, keep dated lines, sort by date (portable: plain sort),
-    # then mark today's lines. No gawk-only functions used.
+    # Strip comments/blanks, keep dated lines, sort by date then start time
+    # (see sort_cal above), then mark today's lines. No gawk-only functions used.
     grep -v '^[[:space:]]*#' "$CAL_FILE" 2>/dev/null \
       | grep -v '^[[:space:]]*$' \
-      | sort \
+      | sort_cal \
       | awk -v today="$today" -v cutoff="$cutoff" -v days="$CAL_DAYS" -v hl="$HL" -v rst="$RST" '
             { d = substr($0, 1, 10) }
             d == today                  { print "  " hl $0 rst; shown=1; next }

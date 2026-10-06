@@ -20,7 +20,8 @@ SUBCOMMANDS
                the meanings.
 
 SECTIONS PRINTED
-    CALENDAR   events from calendar.txt, today .. today+CAL_DAYS
+    CALENDAR   events from calendar.txt, today .. today+CAL_DAYS;
+               same-day events in start-time order (see CALENDAR TIMES)
     TODO       open  :todo:    lines from LIFE.TXT, EXCLUDING any that
                are due soon/overdue (those show in DUE instead -- see
                below, so nothing prints twice)
@@ -48,6 +49,29 @@ SECTIONS PRINTED
     legend and other documentation blocks in LIFE.TXT write tags
     literally to explain them, so they would otherwise be reported as
     real items; the date requirement excludes them wherever they sit.
+
+CALENDAR TIMES
+    Same-day events in calendar.txt are listed in start-time order when
+    the line carries an @ time token, anywhere on the line:
+        @H[:MM][am|pm][-H[:MM][am|pm]]
+    e.g.  @10am   @1pm-3pm   @11-11:15am   @11-12:15pm   @13:30
+
+        2026-10-06 Standup @9:30am-9:45
+        2026-10-06 Lunch with Sam @12-1pm
+        2026-10-06 Review @13:30
+
+    Rules:
+      - Only the START time orders events; ties fall back to line text.
+      - Untimed lines (no @ token) list first for their day, like
+        all-day items.
+      - A start with no am/pm borrows the end's: 11-11:15am is 11am. If
+        that would put the start after the end, it flips to am:
+        11-12:15pm is 11am to 12:15pm, not 11pm.
+      - No am/pm anywhere is 24-hour time: @13:30 is 1:30pm.
+      - The @ must follow whitespace and be followed by a digit, so
+        email addresses (bob@example.com) are never read as times.
+        @ is used for time only; tags in calendar.txt are :tag: tokens,
+        space-separated and not chained, same as LIFE.TXT.
 
 OPTIONS
     -o, --only SECTION    print one section only
@@ -107,6 +131,7 @@ GREP RECIPES
     Calendar past CAL_DAYS -- agenda only shows a window, not the file:
         grep '^2026-08' ~/life/calendar.txt      # a given month
         grep -i "dentist" ~/life/calendar.txt    # any date, by keyword
+        grep ':birthday:' ~/life/calendar.txt    # any date, by tag
 
     due: / completed: / threshold: dates, direct in LIFE.TXT:
         grep 'due:2026-08' ~/life/LIFE.TXT               # a given month
@@ -122,7 +147,8 @@ GREP RECIPES
 FILES
     ~/life/LIFE.TXT               journal / notes / :tag: items -- see its 
                                       own legend block for tag conventions
-    ~/life/calendar.txt           dated events only, chronological, @tag
+    ~/life/calendar.txt           dated events only, chronological, :tag:,
+                                      optional @time (see CALENDAR TIMES)
 
 DEPLOYMENT
     machine-setup repo:  bin/agenda  -->  symlink  ~/.local/bin/agenda

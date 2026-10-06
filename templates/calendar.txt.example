@@ -1,43 +1,64 @@
 # ============================================================
-# calendar.txt   -   one event per line: YYYY-MM-DD  description
-# Tags (@birthday @health @car @family @subscription @bill @trial ...) are
-# OPTIONAL; add one when an entry is worth flagging or filtering later.
+# calendar.txt   -   one event per line: YYYY-MM-DD  description  [@time]
 #
-# Tag style: calendar.txt uses @tag (todo.txt style). LIFE.TXT uses
-# colon-delimited :tag: tokens, space-separated. The difference is
-# intentional - each file follows its own lineage, and :tag: colons delimit
-# tags within the free-form prose of LIFE.TXT, where @ alone could be
-# ambiguous.
+# Tags (:birthday: :health: :car: :family: :subscription: :bill: :trial: ...)
+# are OPTIONAL; add one when an entry is worth flagging or filtering later.
+# 
+# Space-separated, one token each, NOT chained (:a:b:), as in LIFE.TXT:
+#                       2026-10-06  Sam birthday :birthday: :family:
+#
+# Tag style: calendar.txt and LIFE.TXT both use colon-delimited :tag: tokens,
+# space-separated and NOT chained - one syntax to remember, and one grep
+# works across both files.
+#
+# In calendar.txt the @ sign is reserved for time (see below), so it means 
+# one thing only. (Decided when @time was added: @ was about to do two 
+# jobs - tag and time - so tags moved to :tag: rather
+# than keep a different style per file. 
+#
+# Chaining stays off, as in LIFE.TXT.
+#
+# Time: an optional @time token puts same-day events in time order in agenda.
+# Forms: @10am  @1pm-3pm  @11-11:15am  @13:30  (24h when no am/pm).
+# Only the start time orders; untimed entries list first. 
+# A time always starts with a # digit, and @ is used for nothing else.
+# Position on the line does not matter:
+#                       2026-10-06  Dentist @9:30am-10:30am :health:
 #
 # View:  agenda     (today highlighted + upcoming; see: agenda --help)
 # Edit:  vi <path>/calendar.txt   - type a dated line anywhere, save.
 #
 # Layout: entries are kept interleaved in DATE order, so reading the raw file
 # (cat calendar.txt) shows your timeline - what is coming up, next by next.
-# agenda sorts by date at read time regardless, so order is for YOUR reading.
+#
+# agenda sorts by date, then @time, at read time regardless, so order is for
+# YOUR reading. (The vi re-sort below orders a day's entries by text, not
+# time - agenda still shows them in time order.)
 #
 #   Re-sort after edits:  in vi, put the cursor on the first dated line and run
 #                         :.,$!sort      (sorts that line to end; leaves this
 #                         header alone; leading YYYY-MM-DD sorts as plain text)
-#   Grouped view by type: grep @birthday <path>/calendar.txt
+#   Grouped view by type: grep :birthday: <path>/calendar.txt
 #   Annual birthdays:     set the full date to the next occurrence; bump the
 #                         year in place as each passes, then re-sort as above.
 #
-# NOTE: This is a template. The example dates below are illustrative -
-# replace them with your own. (Being in the past, they will not show as
-# upcoming in agenda until you edit them.)
+# NOTE: This is a template. 
+# The example dates below are illustrative - replace them with your own.
+# (Being in the past, they will not show as upcoming in agenda until you edit them.)
+# 
 #
 # NOTE: Location is adjustable. agenda reads it from $LIFE_DIR (default ~/life,
-# so ~/life/calendar.txt). Set LIFE_DIR to point elsewhere, e.g.
+# so ~/life/calendar.txt). 
+# Set LIFE_DIR to point elsewhere, e.g.
 # /mnt/usbflashdrive/life/calendar.txt on a machine using a USB drive.
 # ============================================================
 
-2026-06-26  @subscription  ExampleWeekly - weekly (re-seed as it passes)
-2026-06-30  @trial  Example Service trial ends 2026-07-01 - cancel or keep?
-2026-07-02  @health  Dr. - annual checkup 9:30am
-2026-07-03  @subscription  ExampleWeekly - weekly
-2026-07-12  @subscription  Netflix - monthly. Still want it?
-2026-07-12  @subscription  TSN - monthly. Still want it?
-2026-07-15  @bill  Mortgage payment due (15th monthly)
-2026-09-05  @birthday @family  John Vega (b. 1980)
-2027-03-12  @birthday @family  Jane Doe (b. 1973)
+2026-06-26  :subscription:  ExampleWeekly - weekly (re-seed as it passes)
+2026-06-30  :trial:  Example Service trial ends 2026-07-01 - cancel or keep?
+2026-07-02  :health:  Dr. - annual checkup @9:30am
+2026-07-03  :subscription:  ExampleWeekly - weekly
+2026-07-12  :subscription:  Netflix - monthly. Still want it?
+2026-07-12  :subscription:  TSN - monthly. Still want it?
+2026-07-15  :bill:  Mortgage payment due (15th monthly)
+2026-09-05  :birthday: :family:  John Vega (b. 1980)
+2027-03-12  :birthday: :family:  Jane Doe (b. 1973)

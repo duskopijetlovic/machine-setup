@@ -1,16 +1,21 @@
 # ============================================================
 # LIFE.TXT  -  one big text file (OBTF): journal, ideas, notes, and todos,
-# in one chronological stream. Structure comes from :tags:, not separate files.
+# in one chronological stream.
+#
+# Structure comes from :tags:, not separate files.
 #
 # Entry format:   YYYY-MM-DD Day | free text here :tag: :tag:
 # Separator:      a *** line between entries (visual only; agenda ignores it).
 #
 # Tag style: LIFE.TXT uses colon-delimited :tag: tokens, space-separated
-# (one token each: :todo: :work:), NOT chained (:todo:work:). The colons
-# delimit tags within free-form prose, where @ alone could be ambiguous
-# against ordinary words. calendar.txt uses @tag (todo.txt style) instead;
-# the difference is intentional - each file follows its own lineage.
-#
+# (one token each: :todo: :work:), NOT chained (:todo:work:).
+# 
+# The colons delimit tags within free-form prose, where @ alone could be 
+# ambiguous against ordinary words.
+# 
+# calendar.txt uses the same :tag: style; there @ is
+# reserved for time (@10am, @1pm-3pm), so the two files share one tag syntax.
+# 
 # How agenda reads this file:
 #   open todo       = a line with :todo:    and NOT :done:/:dropped:
 #   open waiting    = a line with :waiting: and NOT :done:/:dropped:
@@ -25,8 +30,9 @@
 #   threshold date  = add  threshold:YYYY-MM-DD  to a line; agenda hides
 #                      it everywhere until that date arrives
 #
-# NOTE: This is a template. Example dates are illustrative - replace with
-# your own. Location is adjustable: agenda reads it from $LIFE_DIR
+# NOTE: This is a template.
+# Example dates are illustrative - replace with your own.
+# Location is adjustable: agenda reads it from $LIFE_DIR
 # (default ~/life, so ~/life/LIFE.TXT); set LIFE_DIR to point elsewhere,
 # e.g. /mnt/usbflashdrive/life/LIFE.TXT on a machine using a USB drive.
 # ============================================================
@@ -34,11 +40,15 @@
 :tag: CONVENTIONS
 ---------------------
 Tags are keywords enclosed in colons, opened AND closed: :like_this:
-Lowercase, underscores for spaces. Every tag opens and closes with a colon.
+Lowercase, underscores for spaces.
+Every tag opens and closes with a colon.
 Tags are space-separated, one token each: :todo: :work: -- NOT chained
-  org-mode style (:todo:work:). Deliberate + org-independent: adopting org
-  later means a full outline conversion, not a colon-syntax match; a clean
-  space-separated file converts more easily, not less. Decided; don't reopen.
+  org-mode style (:todo:work:).
+  Deliberate + org-independent: adopting org later means a full outline 
+  conversion, not a colon-syntax match; a clean space-separated file converts
+  more easily, not less.
+  Decided; don't reopen.
+
 State:  :todo: :waiting: :done: :someday: :dropped:
         (grep ':todo:' LIFE.TXT  finds all open actions; swap state as needed)
 Area:   :work: :health: :career: :family:
@@ -53,14 +63,15 @@ Dated:  :todo: with  due:YYYY-MM-DD   (due: is a key:value token, NOT a tag --
         (grep 'due:' LIFE.TXT  finds all; grep 'due:2026-' for a year)
 Completed:  :done: with  completed:YYYY-MM-DD   (records when an item was
         closed, and excludes the line from every section on its own --
-        no :done: tag required, the date itself is enough. Named
-        "completed:", not "done:", so it can't be confused with the
+        no :done: tag required, the date itself is enough.
+        Named "completed:", not "done:", so it can't be confused with the
         :done: state tag.)
         (grep 'completed:' LIFE.TXT  finds all)
 Threshold:  threshold:YYYY-MM-DD   (hides an entry from TODO/WAITING/DUE
         entirely until that date arrives, then it behaves normally -- for
-        "don't show me this yet", not "remind me by". Works even combined
-        with due:; a future threshold suppresses the whole entry.)
+        "don't show me this yet", not "remind me by".
+        Works even combined with due:; a future threshold suppresses the
+        whole entry.)
         (grep 'threshold:' LIFE.TXT  finds all)
 No contexts (@home/@errands): tasks aren't location-gated here.
 Area covers grouping; reintroduce :context_NAME: only if real
@@ -75,22 +86,26 @@ The *** boundary is three asterisk-clusters on their own line; exact spacing
   and column alignment are NOT significant -- recognizability is the whole job,
   so don't fuss over aligning them or normalizing old ones.
 Semantic line breaks: start each sentence on its own line, breaking at
-  sentence end (the period). Follows Kernighan, "UNIX for Beginners" (1974):
-  "Start each sentence on a new line." (He also suggests breaking at commas/
-  semicolons for long lines; skipped here -- one clean rule, one break per
-  sentence.) Keeps edits, diffs, and greps landing per-sentence.
+  sentence end (the period).
+  Follows Kernighan, "UNIX for Beginners" (1974):
+  "Start each sentence on a new line."
+  (He also suggests breaking at commas/semicolons for long lines;
+   skipped here -- one clean rule, one break per sentence.)
+  Keeps edits, diffs, and greps landing per-sentence.
 Header line (first line of an entry) carries the date + tags and stays WHOLE:
   format:  YYYY-MM-DD Day | text... :tag: :tag:   [due:YYYY-MM-DD]
            [threshold:YYYY-MM-DD]   [completed:YYYY-MM-DD]
   Why whole: agenda is line-based -- :todo:/:waiting:/due:/threshold:/
   completed: must sit together on one line, or they parse as unrelated
-  matches. So header = one line always.
+  matches.
+  So header = one line always.
 Continuation lines (after the header, until the next ***) are free prose:
   use semantic line breaks and blank-line paragraphs as needed. agenda never
   reads these, so structure them purely for future-you.
 Tag placement in multi-line entries: put tags on the HEADER line, so
   grep ':reference:' LIFE.TXT  returns the dated line, not a mid-entry
-  fragment. (Same reason Project tags go on the header, not buried below.)
+  fragment.
+  (Same reason Project tags go on the header, not buried below.)
 ***                                 ***                                    ***
 ------------------
 
