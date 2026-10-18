@@ -1,10 +1,5 @@
 #!/bin/sh
 
-# Created with Google Gemini AI model
-# Date: Sep 26, 2026
-# 
-# For: RHEL 10
-
 # Define log path
 LOG_FILE="$HOME/rhel_update_history.log"
 
@@ -27,7 +22,11 @@ sudo dnf upgrade -y 2>&1 | tee -a "$LOG_FILE"
 printf "\n[2/3] Running Hardware Firmware Updates (fwupdmgr)...\n" | tee -a "$LOG_FILE"
 print_sep
 sudo fwupdmgr refresh 2>&1 | tee -a "$LOG_FILE"
-sudo fwupdmgr update -y 2>&1 | tee -a "$LOG_FILE"
+# -y answers yes to every question, which can include fwupdmgr's "An update
+# requires a reboot to complete. Restart now?" prompt. --no-reboot-check skips
+# that prompt so the script cannot reboot itself mid-run (and skip step 3 and
+# the closing log lines). Reboot yourself afterwards.
+sudo fwupdmgr update -y --no-reboot-check 2>&1 | tee -a "$LOG_FILE"
 
 # 3. Flatpak Desktop Apps Update (Executed safely as standard user)
 printf "\n[3/3] Running Flatpak Desktop App Updates...\n" | tee -a "$LOG_FILE"
@@ -37,5 +36,6 @@ flatpak update -y 2>&1 | tee -a "$LOG_FILE"
 # Finish logging session
 print_sep
 echo "SYSTEM UPDATE COMPLETE: $(date)" | tee -a "$LOG_FILE"
+echo "NOTE: this script never reboots - reboot to finish any kernel or firmware updates." | tee -a "$LOG_FILE"
 print_sep
 echo "Log file saved successfully to: $LOG_FILE"
