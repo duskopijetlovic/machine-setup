@@ -10,10 +10,10 @@
 # including ASCII. --all only affects --encode; --decode always handles any
 # valid escape sequence regardless.
 #
-# Limitation (--uplus): U+XXXX tokens are not self-delimiting. In the default
-# mode, an ASCII hex digit (0-9, a-f, A-F) right after an encoded character
-# is read as part of its code point on decode (U+00E9a -> U+0E9A). Use --all
-# (every character becomes a token) or another format for an exact round trip.
+# --uplus round trips: U+XXXX tokens are not self-delimiting (decode reads up
+# to 6 hex digits). When an ASCII hex digit (0-9, a-f, A-F) follows an encoded
+# character, encode zero-pads that code point to 6 digits (U+0000E9a), so
+# decode reads exactly 6 and 'a' stays a literal 'a'.
 #
 # Examples:
 #   ./uniesc.py --encode --python 'café 🐱'
@@ -67,15 +67,26 @@ def encode_python(text, encode_ascii=False):
     return ''.join(result)
 
 
+_ASCII_HEX = frozenset('0123456789abcdefABCDEF')
+
+
 def encode_uplus(text, encode_ascii=False):
-    """Non-ASCII -> U+XXXX tokens; ASCII passes through unless encode_ascii=True."""
+    """Non-ASCII -> U+XXXX tokens; ASCII passes through unless encode_ascii=True.
+
+    U+ tokens are not self-delimiting, and decode reads up to 6 hex digits. So
+    when a passed-through ASCII hex digit follows a token, the code point is
+    zero-padded to the full 6 digits (U+00E9 then 'a' -> U+0000E9a), which
+    decode reads back exactly. Without a following hex digit the usual 4-6
+    digit form is used, so ordinary output is unchanged."""
     result = []
-    for c in text:
+    for i, c in enumerate(text):
         cp = ord(c)
         if cp < 0x80 and not encode_ascii:
             result.append(c)
         else:
-            result.append(f'U+{cp:04X}')
+            nxt = text[i + 1] if i + 1 < len(text) else ''
+            width = 6 if (not encode_ascii and nxt in _ASCII_HEX) else 4
+            result.append(f'U+{cp:0{width}X}')
     return ''.join(result)
 
 

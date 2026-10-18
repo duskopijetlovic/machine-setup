@@ -15,7 +15,8 @@ inspection, and escape sequence encoding/decoding.
 SETUP
 -----
 
-All three tools require Python 3. No third-party packages needed -- only
+All three tools require Python 3.9 or newer (unichar.py uses
+str.removeprefix). No third-party packages needed -- only
 stdlib (unicodedata, argparse, html, re).
 
 Make them executable:
@@ -23,6 +24,9 @@ Make them executable:
     chmod +x unichar.py uniesc.py unistr
 
 NOTE: unistr  expects  unichar.py  to be in the **same directory**. 
+If you symlink unistr into a directory on your PATH (e.g. ~/.local/bin),
+symlink unichar.py there too: unistr looks next to the path it was invoked
+by, not next to the symlink's target.
 
 Neither tool needs to be on your PATH -- you can keep them in a scripts 
 directory and call them with their full or relative path.
@@ -183,13 +187,20 @@ By default, ASCII characters (U+0000-U+007F) pass through unchanged and
 only non-ASCII characters are encoded. Use --all (or -a) to encode every
 character including ASCII.
 
-    --python    Python/JS style. BMP characters use \uXXXX (4 hex digits);
+    --python    Python/C style. BMP characters use \uXXXX (4 hex digits);
                 non-BMP characters use \UXXXXXXXX (8 hex digits).
+                (JavaScript has no \U escape, so non-BMP output is not
+                valid JS.)
                 Example for e-acute: \u00e9
 
     --uplus     Unicode standard notation. Non-ASCII characters encoded as
                 U+XXXX; ASCII passes through.
                 Example for e-acute: U+00E9
+                Tokens are not self-delimiting (decode reads up to 6 hex
+                digits), so when an ASCII hex digit (0-9, a-f, A-F)
+                follows an encoded character, encode zero-pads it to 6
+                digits: e-acute then "a" gives U+0000E9a, which decodes
+                back exactly. Otherwise output is the usual U+00E9 form.
 
     --html      HTML/XML hex numeric entities.
                 Example for e-acute: &#xE9;
@@ -203,6 +214,7 @@ character including ASCII.
 
     ./uniesc.py --encode --python  'café 🐱'   ->  caf\u00e9 \U0001f431
     ./uniesc.py --encode --uplus   'café 🐱'   ->  cafU+00E9 U+1F431
+    ./uniesc.py --encode --uplus   'éa'        ->  U+0000E9a
     ./uniesc.py --encode --html    'café 🐱'   ->  caf&#xE9; &#x1F431;
     ./uniesc.py --encode --cbytes  'café 🐱'   ->  caf\xc3\xa9 \xf0\x9f\x90\xb1
 
@@ -234,6 +246,11 @@ non-ASCII characters:
 
     echo 'U+0041U+0020U+0042' | ./uniesc.py --decode --uplus        ->  A B
     echo 'U+0041U+0020U+0042' | ./uniesc.py --decode --uplus --all  ->  A B
+
+Code points above U+10FFFF, and surrogates (U+D800-U+DFFF), cannot be
+printed; they are left as written, with a warning on stderr.
+
+--html decode also understands named entities such as &amp; and &eacute;.
 
 
 Short flags
