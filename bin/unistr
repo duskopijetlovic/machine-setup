@@ -1,0 +1,63 @@
+#!/bin/sh
+
+# Created by AI: Claude - Model: Sonnet 4.6
+# Date: Sep 21, 2026
+
+# unistr: show Unicode info for each character in a string
+#         wraps 'unichar.py char' (by code point) for every character in sequence
+#
+# Requires: unichar.py in the same directory as this script, python3
+#
+# Note: uses sh syntax (while read); run as a script (./unistr or unistr),
+#       do not paste directly into tcsh or csh.
+#
+# Usage:
+#   unistr 'Iñtërnâtiônàlizætiøn'
+#   echo 'Iñtërnâtiônàlizætiøn' | unistr
+#
+# Examples:
+#   unistr 'café'
+#   unistr '🐱🐶'
+#   echo 'hello' | unistr
+
+SEP="--------------------"
+
+# Find unichar.py relative to this script's location, so both files can live
+# anywhere together (scripts directory, home directory, etc.) without needing
+# to be on PATH.
+UNICHAR="$(dirname "$0")/unichar.py"
+
+if [ ! -f "$UNICHAR" ]; then
+    echo "Error: unichar.py not found alongside unistr (expected: $UNICHAR)" >&2
+    exit 1
+fi
+if [ ! -x "$UNICHAR" ]; then
+    echo "Error: unichar.py found but not executable (run: chmod +x $UNICHAR)" >&2
+    exit 1
+fi
+
+# Get input: argument or stdin
+if [ $# -ge 1 ]; then
+    input="$1"
+else
+    input=$(cat)
+fi
+
+if [ -z "$input" ]; then
+    echo "Error: No string provided. Usage: unistr 'string' OR echo 'string' | unistr" >&2
+    exit 1
+fi
+
+# Use Python to split into one Unicode code point (hex) per line (grep -o . is
+# byte-aware, not character-aware, and mangles multibyte UTF-8 characters in
+# some environments depending on locale settings). Hex, not the character
+# itself: a newline (or any whitespace) sent as a bare character would arrive
+# as an empty argument and make unichar.py read the loop's stdin instead.
+printf '%s' "$input" | python3 -c "
+import sys
+for c in sys.stdin.read():
+    print(format(ord(c), 'X'))
+" | while IFS= read -r cp; do
+    "$UNICHAR" char "$cp"
+    echo "$SEP"
+done
