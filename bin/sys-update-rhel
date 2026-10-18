@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Created with Google Gemini AI model
+# Date: Sep 26, 2026
+# 
+# For: RHEL 10
+
+# Define log path
+LOG_FILE="$HOME/rhel_update_history.log"
+
+# Clear line helper
+print_sep() {
+    echo "================================================================================" | tee -a "$LOG_FILE"
+}
+
+# Start logging session
+print_sep
+echo "STARTING COMPLETE RHEL SYSTEM UPDATE: $(date)" | tee -a "$LOG_FILE"
+print_sep
+
+# 1. Native DNF OS Upgrade
+printf "\n[1/3] Running Native DNF OS Upgrade...\n" | tee -a "$LOG_FILE"
+print_sep
+sudo dnf upgrade -y 2>&1 | tee -a "$LOG_FILE"
+
+# 2. Hardware Firmware Update
+printf "\n[2/3] Running Hardware Firmware Updates (fwupdmgr)...\n" | tee -a "$LOG_FILE"
+print_sep
+sudo fwupdmgr refresh 2>&1 | tee -a "$LOG_FILE"
+sudo fwupdmgr update -y 2>&1 | tee -a "$LOG_FILE"
+
+# 3. Flatpak Desktop Apps Update (Executed safely as standard user)
+printf "\n[3/3] Running Flatpak Desktop App Updates...\n" | tee -a "$LOG_FILE"
+print_sep
+flatpak update -y 2>&1 | tee -a "$LOG_FILE"
+
+# Finish logging session
+print_sep
+echo "SYSTEM UPDATE COMPLETE: $(date)" | tee -a "$LOG_FILE"
+print_sep
+echo "Log file saved successfully to: $LOG_FILE"
