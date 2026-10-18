@@ -155,6 +155,34 @@ def decode_cbytes(text):
 # Main
 # ---------------------------------------------------------------------------
 
+# Shown at the bottom of --help. Kept ASCII-only so help prints under any
+# locale. The full reference is the README that ships next to this script.
+EPILOG = r"""formats (shown for e-acute U+00E9 and cat face U+1F431):
+  --python   \u00e9    \U0001f431
+  --uplus    U+00E9    U+1F431
+  --html     &#xE9;    &#x1F431;
+  --cbytes   \xc3\xa9  \xf0\x9f\x90\xb1
+
+examples:
+  uniesc.py --decode --python 'caf\u00e9 \U0001f431'
+  uniesc.py --decode --uplus  'cafU+00E9 U+1F431'
+  uniesc.py -e --all --html 'text'
+  echo 'text' | uniesc.py -e --python
+
+notes:
+  --uplus   U+ tokens are not self-delimiting (decode reads up to 6 hex
+            digits). When an ASCII hex digit (0-9, a-f, A-F) follows an
+            encoded character, encode zero-pads it to 6 digits (U+0000E9a)
+            so the round trip is exact.
+  --decode  ignores --all. Code points above U+10FFFF and surrogates
+            (U+D800-U+DFFF) are left as written, with a warning on stderr.
+            --html also decodes named entities (&amp;, &eacute;).
+
+full reference: unichar-unistr-uniesc-README.txt (next to this script)
+"""
+
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog='uniesc',
@@ -164,6 +192,7 @@ def main():
             'Use --all with --encode to encode every character including ASCII.'
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=EPILOG,
     )
 
     direction = parser.add_mutually_exclusive_group(required=True)
@@ -202,6 +231,12 @@ def main():
         'text', nargs='?',
         help='text to process (reads stdin if omitted)',
     )
+
+    # Bare invocation: the required flags are missing anyway, so show the full
+    # help (on stderr, exit 2 like any usage error) instead of a terse error.
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(2)
 
     args = parser.parse_args()
 
