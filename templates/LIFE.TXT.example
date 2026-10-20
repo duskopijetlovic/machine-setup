@@ -5,6 +5,9 @@
 # Structure comes from :tags:, not separate files.
 #
 # Entry format:   YYYY-MM-DD Day | free text here :tag: :tag:
+#                 boxed between two 80-dash rules, surrounded by blank lines
+#                 (visual only; agenda reads the header line itself, nothing
+#                 about the rules or the spacing around it).
 # Separator:      a *** line between entries (visual only; agenda ignores it).
 #
 # Tag style: LIFE.TXT uses colon-delimited :tag: tokens, space-separated
@@ -80,11 +83,42 @@ location-batching ever appears.
 ENTRY STRUCTURE
 An entry is delimited by a *** line; that is the ONLY entry boundary.
   ***           = entry boundary (between entries only, never inside one)
-  blank line    = paragraph break WITHIN an entry (one idea per paragraph)
+  blank line    = paragraph break WITHIN an entry (one idea per paragraph);
+                   also required immediately after *** and immediately
+                   before the next *** (see spacing rule below)
   plain newline = semantic line break between sentences of one paragraph
 The *** boundary is three asterisk-clusters on their own line; exact spacing
   and column alignment are NOT significant -- recognizability is the whole job,
   so don't fuss over aligning them or normalizing old ones.
+
+Header box (decided 2026-10-19; new entries only, see below):
+  The header line sits inside a fixed-width 80-dash rule, repeated above
+  and below it:
+    --------------------------------------------------------------------------------
+    YYYY-MM-DD Day | text... :tag: :tag:
+    --------------------------------------------------------------------------------
+  Purely visual, like *** itself -- agenda reads only the header line
+  between the rules, nothing about the rules or the box. Width is fixed
+  at 80 characters regardless of the header line's own length; don't
+  resize the rule per entry.
+  Why boxed: LIFE.TXT gets read back regularly, not only grepped, and a
+  boxed header is a much stronger visual anchor when scanning a long file
+  than a bare date line. (Researched against OBTF/plain-text-journaling
+  precedent; obtf.ru independently recommends the same boxed shape for
+  files people read regularly, not just search.)
+  Each header line carries its own date, summary, and tags -- never
+  reused from the previous entry -- so that two same-day entries stay
+  distinguishable both on screen and under grep.
+  Decided; don't reopen.
+  Older entries are NOT retrofitted to this shape -- pre-2026-10-19
+  header lines with no box stay exactly as they are.
+
+Spacing around the box:
+  one blank line between *** and the box's opening rule
+  one blank line between the box's closing rule and the entry's body text
+  one blank line between the entry's body text and the NEXT entry's ***
+  (the box is visually isolated on both sides, same as a paragraph break)
+
 Semantic line breaks: start each sentence on its own line, breaking at
   sentence end (the period).
   Follows Kernighan, "UNIX for Beginners" (1974):
@@ -92,39 +126,72 @@ Semantic line breaks: start each sentence on its own line, breaking at
   (He also suggests breaking at commas/semicolons for long lines;
    skipped here -- one clean rule, one break per sentence.)
   Keeps edits, diffs, and greps landing per-sentence.
-Header line (first line of an entry) carries the date + tags and stays WHOLE:
+Header line (the single line inside the box) carries the date + tags and
+  stays WHOLE:
   format:  YYYY-MM-DD Day | text... :tag: :tag:   [due:YYYY-MM-DD]
            [threshold:YYYY-MM-DD]   [completed:YYYY-MM-DD]
   Why whole: agenda is line-based -- :todo:/:waiting:/due:/threshold:/
   completed: must sit together on one line, or they parse as unrelated
   matches.
-  So header = one line always.
-Continuation lines (after the header, until the next ***) are free prose:
+  So header = one line always, now framed by the box rather than left bare.
+Continuation lines (after the box, until the next ***) are free prose:
   use semantic line breaks and blank-line paragraphs as needed. agenda never
   reads these, so structure them purely for future-you.
-Tag placement in multi-line entries: put tags on the HEADER line, so
-  grep ':reference:' LIFE.TXT  returns the dated line, not a mid-entry
-  fragment.
+Tag placement in multi-line entries: put tags on the HEADER line (inside
+  the box), so grep ':reference:' LIFE.TXT  returns the dated line, not a
+  mid-entry fragment.
   (Same reason Project tags go on the header, not buried below.)
 ***                                 ***                                    ***
 ------------------
 
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-05-12 Tue | Idea: write a short post on the RHEL 10 migration :career: :someday:
+--------------------------------------------------------------------------------
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-05-14 Thu | Grateful the monitor toggle script works on the FreeBSD box.
+--------------------------------------------------------------------------------
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-06-01 Mon | Renew the domain before it lapses due:2026-06-20 :todo:
+--------------------------------------------------------------------------------
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-06-03 Wed | Old finished task, kept for the record :todo: :done:
+--------------------------------------------------------------------------------
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-06-10 Wed | rtw89_8852be is the Wi-Fi driver on the E14 :reference:
+--------------------------------------------------------------------------------
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-06-26 Fri | Example service double-charged; support ticket sent, awaiting reply; follow up, else dispute due:2026-06-29 :waiting:
+--------------------------------------------------------------------------------
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-06-28 Sun | Resolved: refund received, ticket closed :waiting: :done:
+--------------------------------------------------------------------------------
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-06-29 Mon | Migrated the last machine to the new setup :reference:
+--------------------------------------------------------------------------------
+
 This entry shows the multi-line form:
 the header above carries the date and tag and stays on one line,
 while these continuation lines use semantic breaks.
@@ -132,15 +199,30 @@ while these continuation lines use semantic breaks.
 A blank line starts a new paragraph, one idea each.
 agenda ignores this entry entirely (:reference:),
 so it is structured purely for reading later.
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-07-02 Thu | Renewed the domain in time :todo: :done: completed:2026-07-02
+--------------------------------------------------------------------------------
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-07-05 Sun | Repaint the fence :todo: threshold:2026-09-01
+--------------------------------------------------------------------------------
+
 Not worth starting before autumn -- paint won't cure right in summer heat.
 Hidden from agenda until the threshold date; then it behaves like any
 other open :todo:.
+
 ***                                   ***                                    ***
+
+--------------------------------------------------------------------------------
 2026-07-08 Wed | Paid the property tax :todo: completed:2026-07-08
+--------------------------------------------------------------------------------
+
 No :done: tag here -- completed: alone is enough to exclude this line
 from every section; the date itself is evidence the item is finished.
+
 ***                                   ***                                    ***
