@@ -4,7 +4,7 @@
 #
 # Structure comes from :tags:, not separate files.
 #
-# Entry format:   YYYY-MM-DD Day | free text here :tag: :tag:
+# Entry format:   YYYY-MM-DD | free text here :tag: :tag:
 #                 boxed between two 80-dash rules.
 # Separator:      a *** line has double purpose: it marks the START of
 #                 an entry, OR, as the file's last line with nothing
@@ -82,24 +82,21 @@ Area covers grouping; reintroduce :context_NAME: only if real
 location-batching ever appears.
 
 ENTRY STRUCTURE
-*** now has DOUBLE PURPOSE (revised 2026-11-07):
-  1. Marks the START of an entry. It is a LEADING marker, not a wrapping
-     pair -- one *** opens the entry that follows it. The same line
-     visually reads as "closing" the entry above it too, but structurally
-     it's one event shared by both.
-  2. As the LAST line of the file, with nothing after it, marks
-     end-of-file instead. A trailing *** does NOT start an empty entry --
-     don't add a header box after it. This is the only context where ***
-     means something other than purpose 1.
-  Both purposes use the identical three-asterisk-cluster line; nothing in
-  the character sequence itself distinguishes them -- position in the file
-  (last line vs. not) is what tells them apart. Decided; don't reopen.
-  ***           = entry start (purpose 1), or end-of-file if it's the
-                   file's last line (purpose 2) -- never appears inside
-                   an entry's body
-  blank line    = paragraph break WITHIN an entry's body (one idea per
-                   paragraph); also the single blank line between an
-                   entry's last line and the next ***  (see spacing below)
+An entry is everything between two lines that are *** and only *** (revised
+  2026-11-18, restated for clarity): the bottom boundary of one entry is,
+  at the same time, the top boundary of the next -- one line, two jobs,
+  not a closing marker and an opening marker stacked together.
+*** has a second, narrower purpose too: as the LAST line of the file, with
+  nothing after it, it marks end-of-file instead of starting an entry.
+  A trailing *** does NOT start an empty entry -- don't add a header box
+  after it. Nothing in the character sequence tells the two purposes
+  apart; position in the file (last line vs. not) is what does.
+  Decided; don't reopen.
+  ***           = entry boundary (doubles as end-of-entry and
+                   start-of-next), or end-of-file if it's the file's
+                   last line -- never appears inside an entry's body
+  blank line    = optional, anywhere within an entry's body (see
+                   Spacing below)
   plain newline = semantic line break between sentences of one paragraph
 The *** marker is three asterisk-clusters on their own line; exact spacing
   and column alignment are NOT significant -- recognizability is the whole
@@ -114,7 +111,7 @@ Header box (decided 2026-10-19, revised 2026-11-07; new entries only, see
   The header line sits inside a fixed-width 80-dash rule, repeated above
   and below it:
     --------------------------------------------------------------------------------
-    YYYY-MM-DD Day | text... :tag: :tag:
+    YYYY-MM-DD | text... :tag: :tag:
     --------------------------------------------------------------------------------
   Purely visual, like *** itself -- agenda reads only the header line
   between the rules, nothing about the rules or the box. Width is fixed
@@ -131,19 +128,26 @@ Header box (decided 2026-10-19, revised 2026-11-07; new entries only, see
   Older entries are NOT retrofitted to this shape -- pre-2026-10-19
   header lines with no box stay exactly as they are.
 
-Spacing (revised 2026-11-07 -- compacted from an earlier three-blank-line
-  version; superseded, don't reintroduce it):
-  NO blank line between *** and the box's opening rule.
-  NO blank line between the box's closing rule and the entry's body
-    (if the entry has no body beyond the header, the next line is
-    simply the blank line below).
-  ONE blank line between the entry's last line (body, or the box's
-    closing rule if there is no body) and the next ***.
-  Rationale: *** is already an unambiguous visual marker on its own;
-  a blank line on both sides of it was redundant. The one blank line
-  that's kept is the one doing distinct work -- marking the seam
-  between two entries -- which is the single gap most worth keeping
-  when scanning a long file. Decided; don't reopen.
+Spacing (revised 2026-11-18 -- supersedes the 2026-11-07 compact-A rule
+  below; that version required exactly one blank line before the next
+  ***, this one doesn't):
+  FIXED: NO blank line between *** and the box's opening rule. The box
+    stays anchored right at the entry's start.
+  FLEXIBLE: everything else. Whether there's a blank line between the
+    box's closing rule and the body, how blank lines fall within the
+    body, and whether there's a blank line before the next *** are all
+    author's discretion, entry by entry -- no required count, no
+    required position.
+  Trade-off, stated plainly: the 2026-11-07 rule guaranteed one blank
+  line at the entry seam specifically so a dense multi-paragraph entry
+  always had a breathing point before the next header. Making that
+  optional means some entries will have it and some won't, so that
+  guarantee is gone -- consistency at the seam is now up to whoever is
+  writing, not the format. Decided; don't reopen (again).
+  [superseded, kept for history -- do not follow this version]
+  2026-11-07: NO blank line between *** and box opening rule; NO blank
+  line between box closing rule and body; ONE blank line between the
+  entry's last line and the next ***.
 
 Semantic line breaks: start each sentence on its own line, breaking at
   sentence end (the period).
@@ -154,7 +158,7 @@ Semantic line breaks: start each sentence on its own line, breaking at
   Keeps edits, diffs, and greps landing per-sentence.
 Header line (the single line inside the box) carries the date + tags and
   stays WHOLE:
-  format:  YYYY-MM-DD Day | text... :tag: :tag:   [due:YYYY-MM-DD]
+  format:  YYYY-MM-DD | text... :tag: :tag:   [due:YYYY-MM-DD]
            [threshold:YYYY-MM-DD]   [completed:YYYY-MM-DD]
   Why whole: agenda is line-based -- :todo:/:waiting:/due:/threshold:/
   completed: must sit together on one line, or they parse as unrelated
@@ -173,7 +177,7 @@ Skeleton (generalized form of everything above; the worked examples below
 
   ***
   --------------------------------------------------------------------------------
-  YYYY-MM-DD Day | header line :tag: :tag:
+  YYYY-MM-DD | header line :tag: :tag:
   --------------------------------------------------------------------------------
   <entry body>
 
@@ -186,42 +190,42 @@ Skeleton (generalized form of everything above; the worked examples below
 ------------------
 ***
 --------------------------------------------------------------------------------
-2026-05-12 Tue | Idea: write a short post on the RHEL 10 migration :career: :someday:
+2026-05-12 | Idea: write a short post on the RHEL 10 migration :career: :someday:
 --------------------------------------------------------------------------------
 
 ***
 --------------------------------------------------------------------------------
-2026-05-14 Thu | Grateful the monitor toggle script works on the FreeBSD box.
+2026-05-14 | Grateful the monitor toggle script works on the FreeBSD box.
 --------------------------------------------------------------------------------
 
 ***
 --------------------------------------------------------------------------------
-2026-06-01 Mon | Renew the domain before it lapses due:2026-06-20 :todo:
+2026-06-01 | Renew the domain before it lapses due:2026-06-20 :todo:
 --------------------------------------------------------------------------------
 
 ***
 --------------------------------------------------------------------------------
-2026-06-03 Wed | Old finished task, kept for the record :todo: :done:
+2026-06-03 | Old finished task, kept for the record :todo: :done:
 --------------------------------------------------------------------------------
 
 ***
 --------------------------------------------------------------------------------
-2026-06-10 Wed | rtw89_8852be is the Wi-Fi driver on the E14 :reference:
+2026-06-10 | rtw89_8852be is the Wi-Fi driver on the E14 :reference:
 --------------------------------------------------------------------------------
 
 ***
 --------------------------------------------------------------------------------
-2026-06-26 Fri | Example service double-charged; support ticket sent, awaiting reply; follow up, else dispute due:2026-06-29 :waiting:
+2026-06-26 | Example service double-charged; support ticket sent, awaiting reply; follow up, else dispute due:2026-06-29 :waiting:
 --------------------------------------------------------------------------------
 
 ***
 --------------------------------------------------------------------------------
-2026-06-28 Sun | Resolved: refund received, ticket closed :waiting: :done:
+2026-06-28 | Resolved: refund received, ticket closed :waiting: :done:
 --------------------------------------------------------------------------------
 
 ***
 --------------------------------------------------------------------------------
-2026-06-29 Mon | Migrated the last machine to the new setup :reference:
+2026-06-29 | Migrated the last machine to the new setup :reference:
 --------------------------------------------------------------------------------
 This entry shows the multi-line form:
 the header above carries the date and tag and stays on one line,
@@ -233,12 +237,12 @@ so it is structured purely for reading later.
 
 ***
 --------------------------------------------------------------------------------
-2026-07-02 Thu | Renewed the domain in time :todo: :done: completed:2026-07-02
+2026-07-02 | Renewed the domain in time :todo: :done: completed:2026-07-02
 --------------------------------------------------------------------------------
 
 ***
 --------------------------------------------------------------------------------
-2026-07-05 Sun | Repaint the fence :todo: threshold:2026-09-01
+2026-07-05 | Repaint the fence :todo: threshold:2026-09-01
 --------------------------------------------------------------------------------
 Not worth starting before autumn -- paint won't cure right in summer heat.
 Hidden from agenda until the threshold date; then it behaves like any
@@ -246,7 +250,7 @@ other open :todo:.
 
 ***
 --------------------------------------------------------------------------------
-2026-07-08 Wed | Paid the property tax :todo: completed:2026-07-08
+2026-07-08 | Paid the property tax :todo: completed:2026-07-08
 --------------------------------------------------------------------------------
 No :done: tag here -- completed: alone is enough to exclude this line
 from every section; the date itself is evidence the item is finished.
